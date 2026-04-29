@@ -52,6 +52,11 @@ export async function getEvents(): Promise<Event[]> {
   return (data ?? []) as Event[]
 }
 
+export async function deleteEvent(id: string): Promise<void> {
+  const { error } = await supabase.from('events').delete().eq('id', id)
+  if (error) throw error
+}
+
 // Rate limiting helpers
 
 const RATE_LIMIT_MAX = 10
