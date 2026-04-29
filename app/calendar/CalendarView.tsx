@@ -23,6 +23,10 @@ function getUserColor(username: string): { fc: string; bg: string; text: string;
 }
 
 
+function fmt(time: string) {
+  return time.substring(0, 5)
+}
+
 function formatDate(dateStr: string): string {
   return new Date(`${dateStr}T12:00:00`).toLocaleDateString('fr-FR', {
     weekday: 'long',
