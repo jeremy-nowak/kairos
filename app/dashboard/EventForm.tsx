@@ -18,12 +18,20 @@ interface FormState {
 const fieldClass =
   'w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base placeholder:text-gray-400'
 
-export function EventForm({ username }: EventFormProps) {
-  const today = new Date().toISOString().split('T')[0]
+function localToday(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
 
+function addOneHour(time: string): string {
+  const [h, m] = time.split(':').map(Number)
+  return `${String((h + 1) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+}
+
+export function EventForm({ username }: EventFormProps) {
   const [form, setForm] = useState<FormState>({
     title: '',
-    date: today,
+    date: localToday(),
     startTime: '09:00',
     endTime: '10:00',
     description: '',
@@ -34,7 +42,12 @@ export function EventForm({ username }: EventFormProps) {
   const [error, setError] = useState('')
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    const { name, value } = e.target
+    if (name === 'startTime') {
+      setForm((prev) => ({ ...prev, startTime: value, endTime: addOneHour(value) }))
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }))
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
