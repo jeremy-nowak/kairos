@@ -29,16 +29,11 @@ export async function sendDiscordNotification({
     { name: '⏰ Horaire',  value: `**${startTime} → ${endTime}**`, inline: true },
   ]
 
-  if (location || description) {
-    fields.push({ name: '​', value: '​', inline: false })
-  }
-
   if (location) {
     fields.push({ name: '📍 Lieu', value: location, inline: true })
   }
 
   if (description) {
-    fields.push({ name: '​', value: '​', inline: false })
     fields.push({ name: '📝 Description', value: description, inline: false })
   }
 
