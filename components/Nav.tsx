@@ -23,6 +23,14 @@ function CalendarIcon({ active }: { active: boolean }) {
   )
 }
 
+function ListIcon({ active }: { active: boolean }) {
+  return (
+    <svg className={`w-6 h-6 transition-colors ${active ? 'text-indigo-600' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+    </svg>
+  )
+}
+
 export function Nav({ username }: NavProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -64,6 +72,16 @@ export function Nav({ username }: NavProps) {
                 }`}
               >
                 Calendrier
+              </Link>
+              <Link
+                href="/events"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+                  pathname === '/events'
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                Événements
               </Link>
             </nav>
           </div>
@@ -126,13 +144,25 @@ export function Nav({ username }: NavProps) {
 
           <Link
             href="/calendar"
-            className="flex flex-col items-center gap-0.5 py-1 px-6 group"
+            className="flex flex-col items-center gap-0.5 py-1 px-4 group"
           >
             <div className={`p-2 rounded-2xl transition-all ${pathname === '/calendar' ? 'bg-indigo-50' : 'group-active:bg-gray-100'}`}>
               <CalendarIcon active={pathname === '/calendar'} />
             </div>
             <span className={`text-xs font-semibold transition-colors ${pathname === '/calendar' ? 'text-indigo-600' : 'text-gray-400'}`}>
               Agenda
+            </span>
+          </Link>
+
+          <Link
+            href="/events"
+            className="flex flex-col items-center gap-0.5 py-1 px-4 group"
+          >
+            <div className={`p-2 rounded-2xl transition-all ${pathname === '/events' ? 'bg-indigo-50' : 'group-active:bg-gray-100'}`}>
+              <ListIcon active={pathname === '/events'} />
+            </div>
+            <span className={`text-xs font-semibold transition-colors ${pathname === '/events' ? 'text-indigo-600' : 'text-gray-400'}`}>
+              Liste
             </span>
           </Link>
         </div>

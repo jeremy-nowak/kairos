@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { createEventSchema } from '@/lib/validators'
-import { createEvent } from '@/lib/db'
+import { createEvent, getEvents } from '@/lib/db'
 import { sendDiscordNotification } from '@/lib/discord'
 import { logger } from '@/lib/logger'
 
@@ -13,6 +13,19 @@ async function verifySession(request: NextRequest): Promise<boolean> {
     return true
   } catch {
     return false
+  }
+}
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  if (!(await verifySession(request))) {
+    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+  }
+
+  try {
+    const events = await getEvents()
+    return NextResponse.json(events)
+  } catch {
+    return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
   }
 }
 
