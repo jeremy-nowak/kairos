@@ -18,6 +18,12 @@ interface FormState {
 const fieldClass =
   'w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base placeholder:text-gray-400'
 
+const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
+  const h = Math.floor(i / 2)
+  const m = i % 2 === 0 ? '00' : '30'
+  return `${String(h).padStart(2, '0')}:${m}`
+})
+
 function localToday(): string {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -128,27 +134,33 @@ export function EventForm({ username }: EventFormProps) {
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Début *
           </label>
-          <input
-            type="time"
+          <select
             name="startTime"
             value={form.startTime}
             onChange={handleChange}
             required
             className={fieldClass}
-          />
+          >
+            {TIME_SLOTS.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Fin *
           </label>
-          <input
-            type="time"
+          <select
             name="endTime"
             value={form.endTime}
             onChange={handleChange}
             required
             className={fieldClass}
-          />
+          >
+            {TIME_SLOTS.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
         </div>
       </div>
 
