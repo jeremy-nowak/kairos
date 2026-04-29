@@ -47,7 +47,7 @@ export function EventForm({ username }: EventFormProps) {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target
     if (name === 'startTime') {
       setForm((prev) => ({ ...prev, startTime: value, endTime: addOneHour(value) }))
