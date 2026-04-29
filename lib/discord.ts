@@ -38,6 +38,7 @@ export async function sendDiscordNotification({
   }
 
   if (description) {
+    fields.push({ name: '​', value: '​', inline: false })
     fields.push({ name: '📝 Description', value: description, inline: false })
   }
 
