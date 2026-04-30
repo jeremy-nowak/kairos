@@ -45,12 +45,12 @@ export function EventList() {
         />
       )}
 
-      <ul className="flex flex-col gap-3">
+      <ul className="flex flex-col gap-3 stagger">
         {events.map((event) => (
           <li
             key={event.id}
             onClick={() => setSelectedEvent(event)}
-            className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-4 cursor-pointer active:scale-[0.98] transition-transform"
+            className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-4 cursor-pointer active:scale-[0.97] transition-all duration-150"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">

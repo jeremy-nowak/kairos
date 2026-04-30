@@ -80,7 +80,7 @@ export function ShoppingLists() {
       </button>
 
       {showForm && (
-        <div className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 space-y-3">
+        <div className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 space-y-3 animate-slide-down">
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -113,12 +113,12 @@ export function ShoppingLists() {
       {lists.length === 0 ? (
         <p className="text-gray-400 text-sm text-center py-10">Aucune liste pour l&apos;instant.</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 stagger">
           {lists.map((list) => (
             <li
               key={list.id}
               onClick={() => router.push(`/shopping/${list.id}`)}
-              className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
+              className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 flex items-center justify-between cursor-pointer active:scale-[0.97] transition-all duration-150"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">

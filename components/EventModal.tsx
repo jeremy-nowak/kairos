@@ -88,10 +88,10 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 z-10 max-h-[90vh] overflow-y-auto"
+        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 z-10 max-h-[90vh] overflow-y-auto animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
