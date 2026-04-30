@@ -20,8 +20,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const lists = await getShoppingLists()
     return NextResponse.json(lists)
-  } catch {
-    return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }
 
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { name, plannedDate } = await request.json() as { name: string; plannedDate?: string }
     const list = await createShoppingList(name, username, plannedDate)
     return NextResponse.json(list)
-  } catch {
-    return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }
