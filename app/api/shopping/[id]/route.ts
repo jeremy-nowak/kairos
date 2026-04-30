@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
-import { deleteEvent, updateEvent } from '@/lib/db'
+import { toggleShoppingItem, deleteShoppingItem } from '@/lib/shopping'
 
 async function verifySession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('session')?.value
@@ -13,18 +13,17 @@ async function verifySession(request: NextRequest): Promise<boolean> {
   }
 }
 
-export async function PUT(
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   if (!(await verifySession(request))) {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   }
-
   try {
-    const body = await request.json() as Record<string, unknown>
-    const event = await updateEvent(params.id, body)
-    return NextResponse.json(event)
+    const { done } = await request.json() as { done: boolean }
+    await toggleShoppingItem(params.id, done)
+    return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
   }
@@ -37,9 +36,8 @@ export async function DELETE(
   if (!(await verifySession(request))) {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   }
-
   try {
-    await deleteEvent(params.id)
+    await deleteShoppingItem(params.id)
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })

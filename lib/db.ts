@@ -52,6 +52,25 @@ export async function getEvents(): Promise<Event[]> {
   return (data ?? []) as Event[]
 }
 
+export async function updateEvent(id: string, input: Partial<CreateEventInput>): Promise<Event> {
+  const { data, error } = await supabase
+    .from('events')
+    .update({
+      ...(input.title !== undefined && { title: input.title }),
+      ...(input.date !== undefined && { date: input.date }),
+      ...(input.startTime !== undefined && { start_time: input.startTime }),
+      ...(input.endTime !== undefined && { end_time: input.endTime }),
+      ...(input.description !== undefined && { description: input.description ?? null }),
+      ...(input.location !== undefined && { location: input.location ?? null }),
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as Event
+}
+
 export async function deleteEvent(id: string): Promise<void> {
   const { error } = await supabase.from('events').delete().eq('id', id)
   if (error) throw error
