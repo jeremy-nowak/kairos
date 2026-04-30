@@ -1,8 +1,15 @@
 import { supabase } from './supabase'
 
+export interface ShoppingList {
+  id: string
+  name: string
+  created_by: string
+  created_at: string
+}
+
 export interface ShoppingItem {
   id: string
-  store: string
+  list_id: string
   product: string
   quantity: string
   photo_url: string | null
@@ -11,11 +18,48 @@ export interface ShoppingItem {
   created_at: string
 }
 
-export async function getShoppingItems(): Promise<ShoppingItem[]> {
+export interface CatalogItem {
+  id: string
+  product: string
+  quantity: string
+  used_count: number
+}
+
+// ── Lists ──────────────────────────────────────────────────────────────────
+
+export async function getShoppingLists(): Promise<ShoppingList[]> {
+  const { data, error } = await supabase
+    .from('shopping_lists')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return (data ?? []) as ShoppingList[]
+}
+
+export async function createShoppingList(name: string, createdBy: string): Promise<ShoppingList> {
+  const { data, error } = await supabase
+    .from('shopping_lists')
+    .insert({ name, created_by: createdBy })
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as ShoppingList
+}
+
+export async function deleteShoppingList(id: string): Promise<void> {
+  const { error } = await supabase.from('shopping_lists').delete().eq('id', id)
+  if (error) throw error
+}
+
+// ── Items ──────────────────────────────────────────────────────────────────
+
+export async function getShoppingItems(listId: string): Promise<ShoppingItem[]> {
   const { data, error } = await supabase
     .from('shopping_items')
     .select('*')
-    .order('store', { ascending: true })
+    .eq('list_id', listId)
     .order('created_at', { ascending: true })
 
   if (error) throw error
@@ -23,7 +67,7 @@ export async function getShoppingItems(): Promise<ShoppingItem[]> {
 }
 
 export async function createShoppingItem(input: {
-  store: string
+  listId: string
   product: string
   quantity: string
   photo_url?: string
@@ -32,7 +76,7 @@ export async function createShoppingItem(input: {
   const { data, error } = await supabase
     .from('shopping_items')
     .insert({
-      store: input.store,
+      list_id: input.listId,
       product: input.product,
       quantity: input.quantity,
       photo_url: input.photo_url ?? null,
@@ -46,30 +90,16 @@ export async function createShoppingItem(input: {
 }
 
 export async function toggleShoppingItem(id: string, done: boolean): Promise<void> {
-  const { error } = await supabase
-    .from('shopping_items')
-    .update({ done })
-    .eq('id', id)
-
+  const { error } = await supabase.from('shopping_items').update({ done }).eq('id', id)
   if (error) throw error
 }
 
 export async function deleteShoppingItem(id: string): Promise<void> {
-  const { error } = await supabase
-    .from('shopping_items')
-    .delete()
-    .eq('id', id)
-
+  const { error } = await supabase.from('shopping_items').delete().eq('id', id)
   if (error) throw error
 }
 
-export interface CatalogItem {
-  id: string
-  product: string
-  store: string
-  quantity: string
-  used_count: number
-}
+// ── Catalog ────────────────────────────────────────────────────────────────
 
 export async function getCatalog(): Promise<CatalogItem[]> {
   const { data, error } = await supabase
@@ -81,7 +111,7 @@ export async function getCatalog(): Promise<CatalogItem[]> {
   return (data ?? []) as CatalogItem[]
 }
 
-export async function upsertCatalogItem(product: string, store: string, quantity: string): Promise<void> {
+export async function upsertCatalogItem(product: string, quantity: string): Promise<void> {
   const { data } = await supabase
     .from('shopping_catalog')
     .select('id, used_count')
@@ -91,14 +121,14 @@ export async function upsertCatalogItem(product: string, store: string, quantity
   if (data) {
     await supabase
       .from('shopping_catalog')
-      .update({ store, quantity, used_count: data.used_count + 1, updated_at: new Date().toISOString() })
+      .update({ quantity, used_count: data.used_count + 1, updated_at: new Date().toISOString() })
       .eq('id', data.id)
   } else {
-    await supabase
-      .from('shopping_catalog')
-      .insert({ product, store, quantity })
+    await supabase.from('shopping_catalog').insert({ product, quantity })
   }
 }
+
+// ── Storage ────────────────────────────────────────────────────────────────
 
 export async function uploadShoppingPhoto(file: Blob, filename: string): Promise<string> {
   const { error } = await supabase.storage

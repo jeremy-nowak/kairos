@@ -5,12 +5,14 @@ import Image from 'next/image'
 import type { ShoppingItem, CatalogItem } from '@/lib/shopping'
 
 interface Props {
+  listId: string
+  listName: string
   username: string
 }
 
 const fieldClass = 'w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base placeholder:text-gray-400'
 
-export function ShoppingList({ username }: Props) {
+export function ItemList({ listId, listName, username }: Props) {
   const [items, setItems] = useState<ShoppingItem[]>([])
   const [catalog, setCatalog] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -19,45 +21,42 @@ export function ShoppingList({ username }: Props) {
   const [preview, setPreview] = useState<string | null>(null)
   const [suggestions, setSuggestions] = useState<CatalogItem[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
-
-  const [form, setForm] = useState({ store: '', product: '', quantity: '1' })
+  const [form, setForm] = useState({ product: '', quantity: '1' })
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/shopping').then((r) => r.json()),
+      fetch(`/api/shopping/${listId}`).then((r) => r.json()),
       fetch('/api/shopping/catalog').then((r) => r.json()),
     ]).then(([items, catalog]) => {
       setItems(Array.isArray(items) ? items : [])
       setCatalog(Array.isArray(catalog) ? catalog : [])
       setLoading(false)
     }).catch(() => setLoading(false))
-  }, [])
+  }, [listId])
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
 
-    if (name === 'product') {
-      if (value.length >= 1) {
-        const matches = catalog.filter((c) =>
-          c.product.toLowerCase().includes(value.toLowerCase())
-        )
-        setSuggestions(matches.slice(0, 5))
-      } else {
-        setSuggestions([])
-      }
+    if (name === 'product' && value.length >= 1) {
+      setSuggestions(
+        catalog
+          .filter((c) => c.product.toLowerCase().includes(value.toLowerCase()))
+          .slice(0, 5)
+      )
+    } else if (name === 'product') {
+      setSuggestions([])
     }
   }
 
   function applySuggestion(item: CatalogItem) {
-    setForm({ product: item.product, store: item.store, quantity: item.quantity })
+    setForm({ product: item.product, quantity: item.quantity })
     setSuggestions([])
   }
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (file) setPreview(URL.createObjectURL(file))
-    else setPreview(null)
+    setPreview(file ? URL.createObjectURL(file) : null)
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -66,28 +65,16 @@ export function ShoppingList({ username }: Props) {
     setSuggestions([])
 
     const fd = new FormData()
-    fd.append('store', form.store)
     fd.append('product', form.product)
     fd.append('quantity', form.quantity)
     const file = fileRef.current?.files?.[0]
     if (file) fd.append('photo', file)
 
-    const res = await fetch('/api/shopping', { method: 'POST', body: fd })
+    const res = await fetch(`/api/shopping/${listId}`, { method: 'POST', body: fd })
     if (res.ok) {
       const item = await res.json() as ShoppingItem
       setItems((prev) => [...prev, item])
-      // Update local catalog
-      setCatalog((prev) => {
-        const existing = prev.find((c) => c.product === form.product)
-        if (existing) {
-          return prev.map((c) => c.product === form.product
-            ? { ...c, store: form.store, quantity: form.quantity, used_count: c.used_count + 1 }
-            : c
-          )
-        }
-        return [...prev, { id: item.id, product: form.product, store: form.store, quantity: form.quantity, used_count: 1 }]
-      })
-      setForm({ store: '', product: '', quantity: '1' })
+      setForm({ product: '', quantity: '1' })
       setPreview(null)
       if (fileRef.current) fileRef.current.value = ''
       setShowForm(false)
@@ -98,7 +85,7 @@ export function ShoppingList({ username }: Props) {
   async function handleToggle(item: ShoppingItem) {
     const newDone = !item.done
     setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, done: newDone } : i))
-    await fetch(`/api/shopping/${item.id}`, {
+    await fetch(`/api/shopping/${listId}/items/${item.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ done: newDone }),
@@ -108,24 +95,21 @@ export function ShoppingList({ username }: Props) {
   async function handleDelete(id: string) {
     if (!confirm('Supprimer cet article ?')) return
     setItems((prev) => prev.filter((i) => i.id !== id))
-    await fetch(`/api/shopping/${id}`, { method: 'DELETE' })
+    await fetch(`/api/shopping/${listId}/items/${id}`, { method: 'DELETE' })
   }
 
-  const grouped = items.reduce<Record<string, ShoppingItem[]>>((acc, item) => {
-    if (!acc[item.store]) acc[item.store] = []
-    acc[item.store].push(item)
-    return acc
-  }, {})
-
   const pending = items.filter((i) => !i.done).length
+  const done = items.filter((i) => i.done)
+  const todo = items.filter((i) => !i.done)
+
+  if (loading) return <p className="text-gray-400 text-sm text-center py-10">Chargement…</p>
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {items.length > 0 && (
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">{pending} article{pending !== 1 ? 's' : ''} restant{pending !== 1 ? 's' : ''}</span>
-          {pending === 0 && <span className="text-sm text-emerald-600 font-semibold">✅ Tout acheté !</span>}
-        </div>
+        <p className="text-sm text-gray-500">
+          {pending === 0 ? '✅ Tout acheté !' : `${pending} article${pending > 1 ? 's' : ''} restant${pending > 1 ? 's' : ''}`}
+        </p>
       )}
 
       <button
@@ -135,13 +119,11 @@ export function ShoppingList({ username }: Props) {
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
-        Ajouter un article
+        Ajouter un produit
       </button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-sm ring-1 ring-gray-100 p-5 space-y-3">
-
-          {/* Product with autocomplete */}
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl ring-1 ring-gray-100 shadow-sm p-5 space-y-3">
           <div className="relative">
             <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Produit *</label>
             <input
@@ -164,7 +146,7 @@ export function ShoppingList({ username }: Props) {
                   >
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{s.product}</p>
-                      <p className="text-xs text-gray-400">{s.store} · qté {s.quantity}</p>
+                      <p className="text-xs text-gray-400">qté habituelle : {s.quantity}</p>
                     </div>
                     <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -173,11 +155,6 @@ export function ShoppingList({ username }: Props) {
                 ))}
               </ul>
             )}
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Magasin *</label>
-            <input name="store" value={form.store} onChange={handleChange} required className={fieldClass} placeholder="Carrefour, Lidl, Amazon…" />
           </div>
 
           <div>
@@ -219,26 +196,44 @@ export function ShoppingList({ username }: Props) {
         </form>
       )}
 
-      {loading ? (
-        <p className="text-gray-400 text-sm text-center py-10">Chargement…</p>
-      ) : items.length === 0 ? (
-        <p className="text-gray-400 text-sm text-center py-10">Aucun article pour l&apos;instant.</p>
+      {items.length === 0 ? (
+        <p className="text-gray-400 text-sm text-center py-10">Aucun produit dans cette liste.</p>
       ) : (
         <div className="space-y-5">
-          {Object.entries(grouped).map(([store, storeItems]) => (
-            <section key={store}>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">
-                🛒 {store} · {storeItems.filter((i) => !i.done).length}/{storeItems.length}
-              </p>
+          {todo.length > 0 && (
+            <ul className="space-y-2">
+              {todo.map((item) => (
+                <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3">
+                  <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-indigo-400 shrink-0 transition" />
+                  {item.photo_url && (
+                    <div className="relative w-12 h-12 shrink-0">
+                      <Image src={item.photo_url} alt={item.product} fill className="object-cover rounded-xl" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm">{item.product}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Qté : {item.quantity}</p>
+                  </div>
+                  <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition shrink-0">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {done.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 px-1">Achetés</p>
               <ul className="space-y-2">
-                {storeItems.map((item) => (
-                  <li key={item.id} className={`bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-3 flex items-center gap-3 transition-opacity ${item.done ? 'opacity-50' : ''}`}>
-                    <button onClick={() => handleToggle(item)} className={`w-6 h-6 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${item.done ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 hover:border-indigo-400'}`}>
-                      {item.done && (
-                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+                {done.map((item) => (
+                  <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 opacity-50">
+                    <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-emerald-500 shrink-0 flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
                     </button>
                     {item.photo_url && (
                       <div className="relative w-12 h-12 shrink-0">
@@ -246,8 +241,8 @@ export function ShoppingList({ username }: Props) {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className={`font-semibold text-gray-900 text-sm ${item.done ? 'line-through' : ''}`}>{item.product}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">Qté : {item.quantity} · {item.created_by}</p>
+                      <p className="font-semibold text-gray-500 text-sm line-through">{item.product}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Qté : {item.quantity}</p>
                     </div>
                     <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition shrink-0">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -257,8 +252,8 @@ export function ShoppingList({ username }: Props) {
                   </li>
                 ))}
               </ul>
-            </section>
-          ))}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { jwtVerify } from 'jose'
 import { redirect } from 'next/navigation'
 import { Nav } from '@/components/Nav'
-import { ShoppingList } from './ShoppingList'
+import { ShoppingLists } from './ShoppingLists'
 
 async function getUsername(): Promise<string> {
   const cookieStore = cookies()
@@ -24,10 +24,10 @@ export default async function ShoppingPage() {
       <Nav username={username} />
       <main className="max-w-lg mx-auto px-4 pt-6 pb-28 md:pb-10">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Liste de courses</h2>
-          <p className="text-sm text-gray-500 mt-1">Articles partagés</p>
+          <h2 className="text-2xl font-bold text-gray-900">Courses</h2>
+          <p className="text-sm text-gray-500 mt-1">Mes listes de courses</p>
         </div>
-        <ShoppingList username={username} />
+        <ShoppingLists />
       </main>
     </div>
   )

@@ -1,29 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
-import { toggleShoppingItem, deleteShoppingItem } from '@/lib/shopping'
+import { deleteShoppingList, getShoppingItems, createShoppingItem, uploadShoppingPhoto, upsertCatalogItem } from '@/lib/shopping'
 
-async function verifySession(request: NextRequest): Promise<boolean> {
+async function getUsername(request: NextRequest): Promise<string | null> {
   const token = request.cookies.get('session')?.value
-  if (!token) return false
+  if (!token) return null
   try {
-    await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET!))
-    return true
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET!))
+    return payload.username as string
   } catch {
-    return false
+    return null
   }
 }
 
-export async function PATCH(
+export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
-  if (!(await verifySession(request))) {
+  if (!(await getUsername(request))) {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   }
   try {
-    const { done } = await request.json() as { done: boolean }
-    await toggleShoppingItem(params.id, done)
-    return NextResponse.json({ ok: true })
+    const items = await getShoppingItems(params.id)
+    return NextResponse.json(items)
+  } catch {
+    return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+): Promise<NextResponse> {
+  const username = await getUsername(request)
+  if (!username) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+
+  try {
+    const formData = await request.formData()
+    const product = formData.get('product') as string
+    const quantity = formData.get('quantity') as string
+    const photo = formData.get('photo') as File | null
+
+    let photo_url: string | undefined
+    if (photo && photo.size > 0) {
+      const ext = photo.name.split('.').pop() ?? 'jpg'
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      photo_url = await uploadShoppingPhoto(photo, filename)
+    }
+
+    const [item] = await Promise.all([
+      createShoppingItem({ listId: params.id, product, quantity, photo_url, createdBy: username }),
+      upsertCatalogItem(product, quantity),
+    ])
+
+    return NextResponse.json(item)
   } catch {
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
   }
@@ -33,11 +63,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
-  if (!(await verifySession(request))) {
+  if (!(await getUsername(request))) {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   }
   try {
-    await deleteShoppingItem(params.id)
+    await deleteShoppingList(params.id)
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
