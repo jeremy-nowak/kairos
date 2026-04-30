@@ -53,7 +53,7 @@ export function Nav({ username }: NavProps) {
   return (
     <>
       {/* ── Desktop top nav ── */}
-      <header className="hidden md:block bg-white border-b border-gray-100">
+      <header className="hidden md:block bg-white border-b border-gray-100 relative z-40">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2.5">
