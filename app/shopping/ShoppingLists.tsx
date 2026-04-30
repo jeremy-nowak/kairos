@@ -9,6 +9,7 @@ export function ShoppingLists() {
   const [lists, setLists] = useState<ShoppingList[]>([])
   const [loading, setLoading] = useState(true)
   const [newName, setNewName] = useState('')
+  const [newDate, setNewDate] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
@@ -25,12 +26,13 @@ export function ShoppingLists() {
     const res = await fetch('/api/shopping', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newName.trim() }),
+      body: JSON.stringify({ name: newName.trim(), plannedDate: newDate || undefined }),
     })
     if (res.ok) {
       const list = await res.json() as ShoppingList
       setLists((prev) => [list, ...prev])
       setNewName('')
+      setNewDate('')
       setShowForm(false)
     }
     setSubmitting(false)
@@ -58,22 +60,33 @@ export function ShoppingLists() {
       </button>
 
       {showForm && (
-        <div className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 flex gap-2">
+        <div className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 space-y-3">
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             placeholder="Carrefour, Lidl, Amazon…"
-            className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-indigo-500"
             autoFocus
           />
-          <button
-            onClick={handleCreate}
-            disabled={submitting || !newName.trim()}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition disabled:opacity-50"
-          >
-            {submitting ? '…' : 'Créer'}
-          </button>
+          <input
+            type="date"
+            value={newDate}
+            onChange={(e) => setNewDate(e.target.value)}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-indigo-500 text-gray-500"
+          />
+          <div className="flex gap-2">
+            <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition">
+              Annuler
+            </button>
+            <button
+              onClick={handleCreate}
+              disabled={submitting || !newName.trim()}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition disabled:opacity-50"
+            >
+              {submitting ? '…' : 'Créer'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -95,7 +108,11 @@ export function ShoppingLists() {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">{list.name}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">par {list.created_by}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {list.planned_date
+                      ? new Date(`${list.planned_date}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+                      : `par ${list.created_by}`}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

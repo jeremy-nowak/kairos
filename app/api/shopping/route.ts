@@ -30,8 +30,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!username) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
   try {
-    const { name } = await request.json() as { name: string }
-    const list = await createShoppingList(name, username)
+    const { name, plannedDate } = await request.json() as { name: string; plannedDate?: string }
+    const list = await createShoppingList(name, username, plannedDate)
     return NextResponse.json(list)
   } catch {
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })

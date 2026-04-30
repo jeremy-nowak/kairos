@@ -3,6 +3,7 @@ import { supabase } from './supabase'
 export interface ShoppingList {
   id: string
   name: string
+  planned_date: string | null
   created_by: string
   created_at: string
 }
@@ -37,10 +38,10 @@ export async function getShoppingLists(): Promise<ShoppingList[]> {
   return (data ?? []) as ShoppingList[]
 }
 
-export async function createShoppingList(name: string, createdBy: string): Promise<ShoppingList> {
+export async function createShoppingList(name: string, createdBy: string, plannedDate?: string): Promise<ShoppingList> {
   const { data, error } = await supabase
     .from('shopping_lists')
-    .insert({ name, created_by: createdBy })
+    .insert({ name, created_by: createdBy, planned_date: plannedDate ?? null })
     .select()
     .single()
 
