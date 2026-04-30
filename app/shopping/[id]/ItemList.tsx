@@ -287,7 +287,7 @@ export function ItemList({ listId, listName, username }: Props) {
             <img
               src={lightbox}
               alt="photo produit"
-              className="block max-w-[88vw] max-h-[78vh] w-auto h-auto rounded-2xl"
+              className="block max-w-[88vw] max-h-[78vh] w-auto h-auto rounded-2xl mix-blend-multiply"
             />
             <button
               onClick={() => setLightbox(null)}
