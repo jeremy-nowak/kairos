@@ -21,7 +21,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const lists = await getShoppingLists()
     return NextResponse.json(lists)
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json({ error: JSON.stringify(err) }, { status: 500 })
   }
 }
 
@@ -34,6 +34,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const list = await createShoppingList(name, username, plannedDate)
     return NextResponse.json(list)
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json({ error: JSON.stringify(err) }, { status: 500 })
   }
 }
