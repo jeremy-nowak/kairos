@@ -16,10 +16,12 @@ export function ItemList({ listId, listName, username }: Props) {
   const [items, setItems] = useState<ShoppingItem[]>([])
   const [catalog, setCatalog] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [offline, setOffline] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [suggestions, setSuggestions] = useState<CatalogItem[]>([])
+  const [lightbox, setLightbox] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({ product: '', quantity: '1' })
 
@@ -27,11 +29,22 @@ export function ItemList({ listId, listName, username }: Props) {
     Promise.all([
       fetch(`/api/shopping/${listId}`).then((r) => r.json()),
       fetch('/api/shopping/catalog').then((r) => r.json()),
-    ]).then(([items, catalog]) => {
-      setItems(Array.isArray(items) ? items : [])
-      setCatalog(Array.isArray(catalog) ? catalog : [])
+    ]).then(([fetchedItems, fetchedCatalog]) => {
+      const itemList = Array.isArray(fetchedItems) ? fetchedItems : []
+      const catalogList = Array.isArray(fetchedCatalog) ? fetchedCatalog : []
+      setItems(itemList)
+      setCatalog(catalogList)
       setLoading(false)
-    }).catch(() => setLoading(false))
+      localStorage.setItem(`kairos_items_${listId}`, JSON.stringify(itemList))
+      localStorage.setItem('kairos_catalog', JSON.stringify(catalogList))
+    }).catch(() => {
+      const cachedItems = localStorage.getItem(`kairos_items_${listId}`)
+      const cachedCatalog = localStorage.getItem('kairos_catalog')
+      if (cachedItems) setItems(JSON.parse(cachedItems))
+      if (cachedCatalog) setCatalog(JSON.parse(cachedCatalog))
+      setOffline(true)
+      setLoading(false)
+    })
   }, [listId])
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -106,6 +119,14 @@ export function ItemList({ listId, listName, username }: Props) {
 
   return (
     <div className="space-y-4">
+      {offline && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs font-medium text-amber-700">
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M12 12h.01M8.464 15.536a5 5 0 010-7.072M5.636 18.364a9 9 0 010-12.728" />
+          </svg>
+          Mode hors ligne — données mises en cache
+        </div>
+      )}
       {items.length > 0 && (
         <p className="text-sm text-gray-500">
           {pending === 0 ? '✅ Tout acheté !' : `${pending} article${pending > 1 ? 's' : ''} restant${pending > 1 ? 's' : ''}`}
@@ -206,9 +227,9 @@ export function ItemList({ listId, listName, username }: Props) {
                 <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3">
                   <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-indigo-400 shrink-0 transition" />
                   {item.photo_url && (
-                    <div className="relative w-12 h-12 shrink-0">
+                    <button onClick={() => setLightbox(item.photo_url)} className="relative w-12 h-12 shrink-0 focus:outline-none">
                       <Image src={item.photo_url} alt={item.product} fill className="object-cover rounded-xl" />
-                    </div>
+                    </button>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 text-sm">{item.product}</p>
@@ -236,9 +257,9 @@ export function ItemList({ listId, listName, username }: Props) {
                       </svg>
                     </button>
                     {item.photo_url && (
-                      <div className="relative w-12 h-12 shrink-0">
+                      <button onClick={() => setLightbox(item.photo_url)} className="relative w-12 h-12 shrink-0 focus:outline-none">
                         <Image src={item.photo_url} alt={item.product} fill className="object-cover rounded-xl" />
-                      </div>
+                      </button>
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-500 text-sm line-through">{item.product}</p>
@@ -254,6 +275,25 @@ export function ItemList({ listId, listName, username }: Props) {
               </ul>
             </div>
           )}
+        </div>
+      )}
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <div className="relative max-w-lg w-full max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
+            <img src={lightbox} alt="photo produit" className="w-full h-auto max-h-[80vh] object-contain rounded-2xl" />
+            <button
+              onClick={() => setLightbox(null)}
+              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg"
+            >
+              <svg className="w-4 h-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
       )}
     </div>

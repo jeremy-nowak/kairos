@@ -13,11 +13,23 @@ export function ShoppingLists() {
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
+  const [offline, setOffline] = useState(false)
+
   useEffect(() => {
     fetch('/api/shopping')
       .then((r) => r.json())
-      .then((data) => { setLists(Array.isArray(data) ? data : []); setLoading(false) })
-      .catch(() => setLoading(false))
+      .then((data) => {
+        const lists = Array.isArray(data) ? data : []
+        setLists(lists)
+        setLoading(false)
+        localStorage.setItem('kairos_shopping_lists', JSON.stringify(lists))
+      })
+      .catch(() => {
+        const cached = localStorage.getItem('kairos_shopping_lists')
+        if (cached) setLists(JSON.parse(cached))
+        setOffline(true)
+        setLoading(false)
+      })
   }, [])
 
   async function handleCreate() {
@@ -49,6 +61,14 @@ export function ShoppingLists() {
 
   return (
     <div className="space-y-4">
+      {offline && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs font-medium text-amber-700">
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M12 12h.01M8.464 15.536a5 5 0 010-7.072M5.636 18.364a9 9 0 010-12.728" />
+          </svg>
+          Mode hors ligne — données mises en cache
+        </div>
+      )}
       <button
         onClick={() => setShowForm((v) => !v)}
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition"
