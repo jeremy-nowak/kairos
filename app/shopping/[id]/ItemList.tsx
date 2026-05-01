@@ -22,8 +22,10 @@ export function ItemList({ listId, listName, username }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [suggestions, setSuggestions] = useState<CatalogItem[]>([])
+  const [suggestionsAbove, setSuggestionsAbove] = useState(false)
   const [lightbox, setLightbox] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const productInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({ product: '', quantity: '1' })
 
   useEffect(() => {
@@ -53,11 +55,13 @@ export function ItemList({ listId, listName, username }: Props) {
     setForm((prev) => ({ ...prev, [name]: value }))
 
     if (name === 'product' && value.length >= 1) {
-      setSuggestions(
-        catalog
-          .filter((c) => c.product.toLowerCase().includes(value.toLowerCase()))
-          .slice(0, 5)
-      )
+      const filtered = catalog.filter((c) => c.product.toLowerCase().includes(value.toLowerCase())).slice(0, 5)
+      setSuggestions(filtered)
+      if (filtered.length > 0 && productInputRef.current) {
+        const rect = productInputRef.current.getBoundingClientRect()
+        const viewportHeight = window.visualViewport?.height ?? window.innerHeight
+        setSuggestionsAbove(viewportHeight - rect.bottom < 220)
+      }
     } else if (name === 'product') {
       setSuggestions([])
     }
@@ -149,6 +153,7 @@ export function ItemList({ listId, listName, username }: Props) {
           <div className="relative">
             <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Produit *</label>
             <input
+              ref={productInputRef}
               name="product"
               value={form.product}
               onChange={handleChange}
@@ -159,7 +164,7 @@ export function ItemList({ listId, listName, username }: Props) {
               autoComplete="off"
             />
             {suggestions.length > 0 && (
-              <ul className="absolute z-10 w-full mt-1 bg-white rounded-2xl shadow-lg ring-1 ring-gray-100 overflow-hidden max-h-48 overflow-y-auto">
+              <ul className={`absolute z-10 w-full bg-white rounded-2xl shadow-lg ring-1 ring-gray-100 overflow-hidden max-h-48 overflow-y-auto ${suggestionsAbove ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
                 {suggestions.map((s) => (
                   <li
                     key={s.id}
