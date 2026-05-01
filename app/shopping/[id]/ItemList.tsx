@@ -166,7 +166,7 @@ export function ItemList({ listId, listName, username }: Props) {
                 if (!productInputRef.current) return
                 const rect = productInputRef.current.getBoundingClientRect()
                 const vh = window.visualViewport?.height ?? window.innerHeight
-                window.scrollBy({ top: rect.top - vh * 0.35, behavior: 'smooth' })
+                window.scrollBy({ top: rect.top - vh * 0.22, behavior: 'smooth' })
               }, 350)}
               onBlur={() => setTimeout(() => setSuggestions([]), 150)}
               required
