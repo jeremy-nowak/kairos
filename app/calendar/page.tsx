@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { jwtVerify } from 'jose'
 import { redirect } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -39,6 +39,8 @@ async function getUsername(): Promise<string> {
 
 export default async function CalendarPage() {
   const [username, events] = await Promise.all([getUsername(), getEvents()])
+  const host = headers().get('host') ?? 'moncerveau.vercel.app'
+  const icalUrl = `webcal://${host}/api/calendar?token=${process.env.ICAL_SECRET}`
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,9 +53,7 @@ export default async function CalendarPage() {
             <p className="text-sm text-gray-500 mt-1">{events.length} événement{events.length !== 1 ? 's' : ''}</p>
           </div>
           <a
-            href={`/api/calendar?token=${process.env.ICAL_SECRET}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={icalUrl}
             className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl transition"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
