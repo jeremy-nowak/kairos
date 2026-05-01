@@ -21,43 +21,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const events = await getEvents()
 
+    const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z'
+
     const vevents = events
       .map((event) => {
         const lines = [
           'BEGIN:VEVENT',
-          `UID:${event.id}@eventping`,
-          `DTSTAMP:${new Date(event.created_at).toISOString().replace(/[-:.]/g, '').slice(0, 15)}Z`,
-          `DTSTART;TZID=Europe/Paris:${toIcalDateTime(event.date, event.start_time)}`,
-          `DTEND;TZID=Europe/Paris:${toIcalDateTime(event.date, event.end_time)}`,
+          `UID:${event.id}@kairos`,
+          `DTSTAMP:${now}`,
+          `DTSTART:${toIcalDateTime(event.date, event.start_time)}`,
+          `DTEND:${toIcalDateTime(event.date, event.end_time)}`,
           `SUMMARY:${escapeIcal(event.title)}`,
         ]
         if (event.description) lines.push(`DESCRIPTION:${escapeIcal(event.description)}`)
         if (event.location) lines.push(`LOCATION:${escapeIcal(event.location)}`)
-        lines.push(`X-CREATED-BY:${escapeIcal(event.created_by)}`)
         lines.push('END:VEVENT')
         return lines.join('\r\n')
       })
       .join('\r\n')
-
-    const vtimezone = [
-      'BEGIN:VTIMEZONE',
-      'TZID:Europe/Paris',
-      'BEGIN:DAYLIGHT',
-      'TZOFFSETFROM:+0100',
-      'TZOFFSETTO:+0200',
-      'TZNAME:CEST',
-      'DTSTART:19700329T020000',
-      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3',
-      'END:DAYLIGHT',
-      'BEGIN:STANDARD',
-      'TZOFFSETFROM:+0200',
-      'TZOFFSETTO:+0100',
-      'TZNAME:CET',
-      'DTSTART:19701025T030000',
-      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10',
-      'END:STANDARD',
-      'END:VTIMEZONE',
-    ].join('\r\n')
 
     const ical = [
       'BEGIN:VCALENDAR',
@@ -66,13 +47,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
       'X-WR-CALNAME:Kairos',
-      'X-WR-TIMEZONE:Europe/Paris',
-      vtimezone,
       vevents,
       'END:VCALENDAR',
-    ]
-      .filter(Boolean)
-      .join('\r\n')
+      '',
+    ].join('\r\n')
 
     return new NextResponse(ical, {
       headers: {
