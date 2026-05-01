@@ -280,14 +280,14 @@ export function ItemList({ listId, listName, username }: Props) {
 
       {lightbox && (
         <div
-          className="fixed inset-0 z-50 bg-black flex items-center justify-center p-6 animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-6 animate-fade-in"
           onClick={() => setLightbox(null)}
         >
           <div className="relative animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <img
               src={lightbox}
               alt="photo produit"
-              className="block max-w-[88vw] max-h-[78vh] w-auto h-auto rounded-2xl mix-blend-multiply"
+              className="block max-w-[92vw] max-h-[88vh] w-auto h-auto rounded-2xl"
             />
             <button
               onClick={() => setLightbox(null)}
