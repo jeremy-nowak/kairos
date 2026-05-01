@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, ChangeEvent, FormEvent } from 'react'
+import React, { useEffect, useRef, useState, ChangeEvent, FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import type { ShoppingItem, CatalogItem } from '@/lib/shopping'
@@ -22,7 +22,7 @@ export function ItemList({ listId, listName, username }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [suggestions, setSuggestions] = useState<CatalogItem[]>([])
-  const [suggestionsAbove, setSuggestionsAbove] = useState(false)
+  const [suggestionStyle, setSuggestionStyle] = useState<React.CSSProperties>({})
   const [lightbox, setLightbox] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const productInputRef = useRef<HTMLInputElement>(null)
@@ -55,12 +55,17 @@ export function ItemList({ listId, listName, username }: Props) {
     setForm((prev) => ({ ...prev, [name]: value }))
 
     if (name === 'product' && value.length >= 1) {
-      const filtered = catalog.filter((c) => c.product.toLowerCase().includes(value.toLowerCase())).slice(0, 5)
+      const filtered = catalog.filter((c) => c.product.toLowerCase().includes(value.toLowerCase())).slice(0, 4)
       setSuggestions(filtered)
       if (filtered.length > 0 && productInputRef.current) {
         const rect = productInputRef.current.getBoundingClientRect()
-        const viewportHeight = window.visualViewport?.height ?? window.innerHeight
-        setSuggestionsAbove(viewportHeight - rect.bottom < 220)
+        const vh = window.visualViewport?.height ?? window.innerHeight
+        const spaceBelow = vh - rect.bottom
+        if (spaceBelow < 200) {
+          setSuggestionStyle({ position: 'fixed', left: rect.left, width: rect.width, bottom: vh - rect.top + 6, zIndex: 60 })
+        } else {
+          setSuggestionStyle({ position: 'fixed', left: rect.left, width: rect.width, top: rect.bottom + 6, zIndex: 60 })
+        }
       }
     } else if (name === 'product') {
       setSuggestions([])
@@ -163,24 +168,25 @@ export function ItemList({ listId, listName, username }: Props) {
               placeholder="Lait, pain, shampoing…"
               autoComplete="off"
             />
-            {suggestions.length > 0 && (
-              <ul className={`absolute z-10 w-full bg-white rounded-2xl shadow-lg ring-1 ring-gray-100 overflow-hidden max-h-48 overflow-y-auto ${suggestionsAbove ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
+            {suggestions.length > 0 && createPortal(
+              <ul style={suggestionStyle} className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
                 {suggestions.map((s) => (
                   <li
                     key={s.id}
                     onMouseDown={() => applySuggestion(s)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-indigo-50 cursor-pointer transition"
+                    className="flex items-center justify-between px-4 py-3.5 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer transition border-b border-gray-50 last:border-0"
                   >
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{s.product}</p>
                       <p className="text-xs text-gray-400">qté habituelle : {s.quantity}</p>
                     </div>
-                    <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </li>
                 ))}
-              </ul>
+              </ul>,
+              document.body
             )}
           </div>
 
