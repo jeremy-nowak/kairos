@@ -225,7 +225,7 @@ export function ItemList({ listId, listName, username }: Props) {
           {todo.length > 0 && (
             <ul className="space-y-2 stagger">
               {todo.map((item) => (
-                <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 transition-opacity duration-200">
+                <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 transition-opacity duration-200 select-none">
                   <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-indigo-400 shrink-0 transition" />
                   {item.photo_url && (
                     <button onClick={() => setLightbox(item.photo_url)} className="relative w-12 h-12 shrink-0 focus:outline-none">
@@ -251,7 +251,7 @@ export function ItemList({ listId, listName, username }: Props) {
               <p className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 px-1">Achetés</p>
               <ul className="space-y-2">
                 {done.map((item) => (
-                  <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 opacity-50 transition-opacity duration-200">
+                  <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 opacity-50 transition-opacity duration-200 select-none">
                     <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-emerald-500 shrink-0 flex items-center justify-center">
                       <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

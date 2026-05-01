@@ -118,7 +118,7 @@ export function ShoppingLists() {
             <li
               key={list.id}
               onClick={() => router.push(`/shopping/${list.id}`)}
-              className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 flex items-center justify-between cursor-pointer active:scale-[0.97] transition-all duration-150"
+              className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 flex items-center justify-between cursor-pointer active:scale-[0.97] transition-all duration-150 select-none"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
