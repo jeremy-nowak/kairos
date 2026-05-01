@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, ChangeEvent, FormEvent } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import type { ShoppingItem, CatalogItem } from '@/lib/shopping'
 
@@ -278,7 +279,7 @@ export function ItemList({ listId, listName, username }: Props) {
         </div>
       )}
 
-      {lightbox && (
+      {lightbox && createPortal(
         <div
           className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-6 animate-fade-in"
           onClick={() => setLightbox(null)}
@@ -298,7 +299,8 @@ export function ItemList({ listId, listName, username }: Props) {
               </svg>
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
