@@ -162,7 +162,12 @@ export function ItemList({ listId, listName, username }: Props) {
               name="product"
               value={form.product}
               onChange={handleChange}
-              onFocus={() => setTimeout(() => productInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350)}
+              onFocus={() => setTimeout(() => {
+                if (!productInputRef.current) return
+                const rect = productInputRef.current.getBoundingClientRect()
+                const vh = window.visualViewport?.height ?? window.innerHeight
+                window.scrollBy({ top: rect.top - vh * 0.35, behavior: 'smooth' })
+              }, 350)}
               onBlur={() => setTimeout(() => setSuggestions([]), 150)}
               required
               className={fieldClass}
