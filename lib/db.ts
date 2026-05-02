@@ -89,6 +89,11 @@ export async function getEventLocations(): Promise<string[]> {
   return (data ?? []).map((row: { location: string }) => row.location)
 }
 
+export async function deleteEventLocation(location: string): Promise<void> {
+  const { error } = await supabase.from('event_locations').delete().eq('location', location)
+  if (error) throw error
+}
+
 export async function upsertEventLocation(location: string): Promise<void> {
   if (!location.trim()) return
 

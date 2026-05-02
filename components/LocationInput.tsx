@@ -54,6 +54,16 @@ export function LocationInput({ value, onChange, className, placeholder }: Props
     setSuggestions([])
   }
 
+  async function removeLocation(loc: string) {
+    setAllLocations((prev) => prev.filter((l) => l !== loc))
+    setSuggestions((prev) => prev.filter((l) => l !== loc))
+    await fetch('/api/events/locations', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ location: loc }),
+    })
+  }
+
   return (
     <>
       <input
@@ -62,7 +72,13 @@ export function LocationInput({ value, onChange, className, placeholder }: Props
         name="location"
         value={value}
         onChange={handleChange}
-        onBlur={() => setSuggestions([])}
+        onFocus={() => setTimeout(() => {
+          if (!inputRef.current) return
+          const rect = inputRef.current.getBoundingClientRect()
+          const vh = window.visualViewport?.height ?? window.innerHeight
+          window.scrollBy({ top: rect.top - vh * 0.22, behavior: 'smooth' })
+        }, 350)}
+        onBlur={() => setTimeout(() => setSuggestions([]), 150)}
         className={className}
         placeholder={placeholder}
         autoComplete="off"
@@ -71,18 +87,29 @@ export function LocationInput({ value, onChange, className, placeholder }: Props
         createPortal(
           <ul style={dropStyle} className="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden">
             {suggestions.map((loc) => (
-              <li key={loc}>
+              <li key={loc} className="flex items-center border-b border-gray-50 last:border-0">
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => applySuggestion(loc)}
-                  className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2.5"
+                  className="flex-1 text-left px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2.5 transition-colors"
                 >
                   <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   {loc}
+                </button>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => removeLocation(loc)}
+                  className="px-3 py-3 text-gray-300 hover:text-red-400 transition-colors shrink-0"
+                  aria-label="Supprimer cette suggestion"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </li>
             ))}
