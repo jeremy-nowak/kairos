@@ -2,6 +2,7 @@
 
 import { useState, ChangeEvent } from 'react'
 import type { Event } from '@/lib/db'
+import { LocationInput } from '@/components/LocationInput'
 
 const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
@@ -133,7 +134,12 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Lieu</label>
-              <input name="location" value={form.location} onChange={handleChange} className={fieldClass} placeholder="Adresse, Zoom…" />
+              <LocationInput
+                value={form.location}
+                onChange={(val) => setForm((prev) => ({ ...prev, location: val }))}
+                className={fieldClass}
+                placeholder="Adresse, Zoom…"
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Description</label>

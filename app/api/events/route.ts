@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { createEventSchema } from '@/lib/validators'
-import { createEvent, getEvents } from '@/lib/db'
+import { createEvent, getEvents, upsertEventLocation } from '@/lib/db'
 import { sendDiscordNotification } from '@/lib/discord'
 import { logger } from '@/lib/logger'
 
@@ -52,10 +52,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   })
 
   try {
-    await Promise.all([
+    const upsertOps: Promise<unknown>[] = [
       createEvent({ title, date, startTime, endTime, description, location, createdBy: username }),
       sendDiscordNotification({ username, title, date: displayDate, startTime, endTime, description, location }),
-    ])
+    ]
+    if (location) upsertOps.push(upsertEventLocation(location))
+    await Promise.all(upsertOps)
 
     logger.info('Event created', { title, date, username })
     return NextResponse.json({ ok: true })

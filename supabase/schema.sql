@@ -13,6 +13,16 @@ CREATE TABLE events (
 
 CREATE INDEX events_date_idx ON events (date, start_time);
 
+-- Lieux des événements pour l'autocomplétion
+CREATE TABLE event_locations (
+  id         UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+  location   TEXT        NOT NULL UNIQUE,
+  used_count INTEGER     DEFAULT 1 NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX event_locations_used_count_idx ON event_locations (used_count DESC);
+
 -- Tentatives de connexion pour le rate limiting
 CREATE TABLE login_attempts (
   id         UUID        DEFAULT gen_random_uuid() PRIMARY KEY,

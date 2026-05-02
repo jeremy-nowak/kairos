@@ -76,6 +76,38 @@ export async function deleteEvent(id: string): Promise<void> {
   if (error) throw error
 }
 
+// Event location catalog
+
+export async function getEventLocations(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('event_locations')
+    .select('location')
+    .order('used_count', { ascending: false })
+    .limit(50)
+
+  if (error) throw error
+  return (data ?? []).map((row: { location: string }) => row.location)
+}
+
+export async function upsertEventLocation(location: string): Promise<void> {
+  if (!location.trim()) return
+
+  const { data } = await supabase
+    .from('event_locations')
+    .select('id, used_count')
+    .eq('location', location)
+    .single()
+
+  if (data) {
+    await supabase
+      .from('event_locations')
+      .update({ used_count: data.used_count + 1, updated_at: new Date().toISOString() })
+      .eq('id', data.id)
+  } else {
+    await supabase.from('event_locations').insert({ location })
+  }
+}
+
 // Rate limiting helpers
 
 const RATE_LIMIT_MAX = 10

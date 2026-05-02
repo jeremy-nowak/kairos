@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, FormEvent, ChangeEvent } from 'react'
+import { LocationInput } from '@/components/LocationInput'
 
 interface EventFormProps {
   username: string
@@ -169,11 +170,9 @@ export function EventForm({ username }: EventFormProps) {
         <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
           Lieu
         </label>
-        <input
-          type="text"
-          name="location"
+        <LocationInput
           value={form.location}
-          onChange={handleChange}
+          onChange={(val) => setForm((prev) => ({ ...prev, location: val }))}
           className={fieldClass}
           placeholder="Adresse, Zoom, téléphone…"
         />

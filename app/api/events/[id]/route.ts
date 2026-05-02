@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
-import { deleteEvent, updateEvent } from '@/lib/db'
+import { deleteEvent, updateEvent, upsertEventLocation } from '@/lib/db'
 
 async function verifySession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('session')?.value
@@ -23,7 +23,10 @@ export async function PUT(
 
   try {
     const body = await request.json() as Record<string, unknown>
-    const event = await updateEvent(params.id, body)
+    const [event] = await Promise.all([
+      updateEvent(params.id, body),
+      typeof body.location === 'string' && body.location ? upsertEventLocation(body.location) : Promise.resolve(),
+    ])
     return NextResponse.json(event)
   } catch {
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
