@@ -58,7 +58,7 @@ export function CalendarView({ events: initialEvents }: CalendarViewProps) {
         />
       )}
 
-      <div className="bg-white rounded-3xl shadow-sm ring-1 ring-gray-100 p-3 md:p-6">
+      <div className="glass rounded-3xl shadow-2xl shadow-black/30 p-3 md:p-6">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"

@@ -85,16 +85,16 @@ export function LocationInput({ value, onChange, className, placeholder }: Props
       />
       {suggestions.length > 0 &&
         createPortal(
-          <ul style={dropStyle} className="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden">
+          <ul style={dropStyle} className="glass-strong rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
             {suggestions.map((loc) => (
-              <li key={loc} className="flex items-center border-b border-gray-50 last:border-0">
+              <li key={loc} className="flex items-center border-b border-white/[0.06] last:border-0">
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => applySuggestion(loc)}
-                  className="flex-1 text-left px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2.5 transition-colors"
+                  className="flex-1 text-left px-4 py-3 text-sm text-white/80 hover:bg-white/[0.06] flex items-center gap-2.5 transition-colors"
                 >
-                  <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -104,7 +104,7 @@ export function LocationInput({ value, onChange, className, placeholder }: Props
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => removeLocation(loc)}
-                  className="px-3 py-3 text-gray-300 hover:text-red-400 transition-colors shrink-0"
+                  className="px-3 py-3 text-white/20 hover:text-red-400 transition-colors shrink-0"
                   aria-label="Supprimer cette suggestion"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

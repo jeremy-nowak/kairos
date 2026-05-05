@@ -20,12 +20,12 @@ export default async function ShoppingPage() {
   const username = await getUsername()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relative min-h-screen">
       <Nav username={username} />
-      <main className="max-w-lg mx-auto px-4 pt-6 pb-28 md:pb-10">
+      <main className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-28 md:pb-10">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Courses</h2>
-          <p className="text-sm text-gray-500 mt-1">Mes listes de courses</p>
+          <h2 className="text-2xl font-bold text-white">Courses</h2>
+          <p className="text-sm text-white/40 mt-1">Mes listes de courses</p>
         </div>
         <ShoppingLists />
       </main>

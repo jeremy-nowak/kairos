@@ -20,7 +20,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className={`${inter.className} min-h-screen`}>
+      <body className={`${inter.className} min-h-screen bg-[#0b0c11]`}>
         <PageTransition>{children}</PageTransition>
       </body>
     </html>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, FormEvent, ChangeEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { LocationInput } from '@/components/LocationInput'
 
 interface EventFormProps {
@@ -18,7 +19,7 @@ interface FormState {
 }
 
 const fieldClass =
-  'w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base placeholder:text-gray-400'
+  'glass-input w-full px-4 py-3.5 rounded-2xl transition text-base'
 
 const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
@@ -37,6 +38,7 @@ function addOneHour(time: string): string {
 }
 
 export function EventForm({ username }: EventFormProps) {
+  const router = useRouter()
   const [form, setForm] = useState<FormState>({
     title: '',
     date: localToday(),
@@ -47,7 +49,6 @@ export function EventForm({ username }: EventFormProps) {
     assignedTo: '',
   })
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
@@ -62,7 +63,6 @@ export function EventForm({ username }: EventFormProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setLoading(true)
-    setSuccess(false)
     setError('')
 
     try {
@@ -77,9 +77,7 @@ export function EventForm({ username }: EventFormProps) {
       })
 
       if (res.ok) {
-        setSuccess(true)
-        setForm((prev) => ({ ...prev, title: '', description: '', location: '', assignedTo: '' }))
-        setTimeout(() => setSuccess(false), 4000)
+        router.push('/events')
       } else {
         const data = (await res.json()) as { error?: string }
         setError(data.error ?? 'Une erreur est survenue')
@@ -93,25 +91,15 @@ export function EventForm({ username }: EventFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {success && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-4 rounded-2xl flex items-center gap-3">
-          <span className="text-2xl">🎉</span>
-          <div>
-            <p className="font-semibold text-sm">Événement créé !</p>
-            <p className="text-xs text-emerald-600 mt-0.5">Notification Discord envoyée</p>
-          </div>
-        </div>
-      )}
-
       {error && (
-        <div className="bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-2xl flex items-center gap-2">
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-2xl flex items-center gap-2">
           <span>⚠️</span> {error}
         </div>
       )}
 
       {/* Title */}
       <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+        <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
           Titre *
         </label>
         <input
@@ -127,7 +115,7 @@ export function EventForm({ username }: EventFormProps) {
 
       {/* Date */}
       <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+        <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
           Date *
         </label>
         <input
@@ -143,7 +131,7 @@ export function EventForm({ username }: EventFormProps) {
       {/* Time row */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
             Début *
           </label>
           <select
@@ -159,7 +147,7 @@ export function EventForm({ username }: EventFormProps) {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
             Fin *
           </label>
           <select
@@ -178,7 +166,7 @@ export function EventForm({ username }: EventFormProps) {
 
       {/* Location */}
       <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+        <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
           Lieu
         </label>
         <LocationInput
@@ -191,7 +179,7 @@ export function EventForm({ username }: EventFormProps) {
 
       {/* Assigné à */}
       <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+        <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
           Assigné à
         </label>
         <div className="flex gap-2">
@@ -199,8 +187,12 @@ export function EventForm({ username }: EventFormProps) {
             const label = person === 'jeremy' ? 'Jérémy' : 'Tatiana'
             const isSelected = form.assignedTo === person
             const colorClass = person === 'jeremy'
-              ? isSelected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-indigo-600 border-indigo-200 hover:border-indigo-400'
-              : isSelected ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-rose-500 border-rose-200 hover:border-rose-400'
+              ? isSelected
+                ? 'bg-indigo-600 text-white border-indigo-500'
+                : 'bg-transparent text-indigo-400 border-indigo-500/30 hover:border-indigo-500/60'
+              : isSelected
+                ? 'bg-rose-600 text-white border-rose-500'
+                : 'bg-transparent text-rose-400 border-rose-500/30 hover:border-rose-500/60'
             return (
               <button
                 key={person}
@@ -217,7 +209,7 @@ export function EventForm({ username }: EventFormProps) {
 
       {/* Description */}
       <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+        <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
           Description
         </label>
         <textarea
@@ -233,7 +225,7 @@ export function EventForm({ username }: EventFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 text-base"
+        className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-900/40 text-base"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">

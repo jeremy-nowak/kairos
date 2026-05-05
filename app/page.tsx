@@ -31,20 +31,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 flex flex-col items-center justify-center p-5">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl mb-4 shadow-xl ring-1 ring-white/30">
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-5 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-[#0b0c11] to-violet-900/30 pointer-events-none" />
+
+      <div className="relative w-full max-w-sm z-10">
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 glass rounded-3xl mb-5 shadow-xl shadow-indigo-950/50">
             <span className="text-4xl">📅</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">Kairos</h1>
-          <p className="text-white/60 text-sm mt-1.5">Calendrier partagé · Notifications Discord</p>
+          <p className="text-white/40 text-sm mt-1.5">Calendrier partagé · Notifications Discord</p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-6 ring-1 ring-white/50">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Card */}
+        <div className="glass rounded-3xl shadow-2xl shadow-black/40 p-7">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
                 Utilisateur
               </label>
               <input
@@ -55,13 +60,13 @@ export default function LoginPage() {
                 autoFocus
                 autoCapitalize="none"
                 autoCorrect="off"
-                className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base"
+                className="glass-input w-full px-4 py-3.5 rounded-2xl transition text-base"
                 placeholder="jeremy"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
                 Mot de passe
               </label>
               <input
@@ -69,13 +74,13 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base"
+                className="glass-input w-full px-4 py-3.5 rounded-2xl transition text-base"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-2xl border border-red-100 flex items-center gap-2">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-2xl flex items-center gap-2">
                 <span className="text-base">⚠️</span>
                 {error}
               </div>
@@ -84,7 +89,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold py-3.5 rounded-2xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 mt-1 text-base"
+              className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 rounded-2xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-900/50 mt-1 text-base"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

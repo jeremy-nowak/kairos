@@ -11,7 +11,7 @@ interface Props {
   username: string
 }
 
-const fieldClass = 'w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-gray-900 text-base placeholder:text-gray-400'
+const fieldClass = 'glass-input w-full px-4 py-3 rounded-2xl transition text-base placeholder:text-white/25'
 
 export function ItemList({ listId, listName, username }: Props) {
   const [items, setItems] = useState<ShoppingItem[]>([])
@@ -125,12 +125,12 @@ export function ItemList({ listId, listName, username }: Props) {
   const done = items.filter((i) => i.done)
   const todo = items.filter((i) => !i.done)
 
-  if (loading) return <p className="text-gray-400 text-sm text-center py-10">Chargement…</p>
+  if (loading) return <p className="text-white/30 text-sm text-center py-10">Chargement…</p>
 
   return (
     <div className="space-y-4">
       {offline && (
-        <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs font-medium text-amber-700">
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-xs font-medium text-amber-400">
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M12 12h.01M8.464 15.536a5 5 0 010-7.072M5.636 18.364a9 9 0 010-12.728" />
           </svg>
@@ -138,14 +138,14 @@ export function ItemList({ listId, listName, username }: Props) {
         </div>
       )}
       {items.length > 0 && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-white/40">
           {pending === 0 ? '✅ Tout acheté !' : `${pending} article${pending > 1 ? 's' : ''} restant${pending > 1 ? 's' : ''}`}
         </p>
       )}
 
       <button
         onClick={() => { setShowForm((v) => !v); setSuggestions([]) }}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition"
+        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold text-indigo-400 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/20 transition"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -154,9 +154,9 @@ export function ItemList({ listId, listName, username }: Props) {
       </button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-3xl ring-1 ring-gray-100 shadow-sm p-5 space-y-3 animate-slide-down">
+        <form onSubmit={handleSubmit} className="glass rounded-3xl p-5 space-y-3 animate-slide-down">
           <div className="relative">
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Produit *</label>
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5">Produit *</label>
             <input
               ref={productInputRef}
               name="product"
@@ -175,16 +175,16 @@ export function ItemList({ listId, listName, username }: Props) {
               autoComplete="off"
             />
             {suggestions.length > 0 && createPortal(
-              <ul style={suggestionStyle} className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
+              <ul style={suggestionStyle} className="glass-strong rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
                 {suggestions.map((s) => (
                   <li
                     key={s.id}
                     onMouseDown={() => applySuggestion(s)}
-                    className="flex items-center justify-between px-4 py-3.5 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer transition border-b border-gray-50 last:border-0"
+                    className="flex items-center justify-between px-4 py-3.5 hover:bg-white/[0.06] active:bg-white/[0.08] cursor-pointer transition border-b border-white/[0.06] last:border-0"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">{s.product}</p>
-                      <p className="text-xs text-gray-400">qté habituelle : {s.quantity}</p>
+                      <p className="text-sm font-semibold text-white">{s.product}</p>
+                      <p className="text-xs text-white/35">qté habituelle : {s.quantity}</p>
                     </div>
                     <svg className="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -197,18 +197,18 @@ export function ItemList({ listId, listName, username }: Props) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Quantité</label>
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5">Quantité</label>
             <input name="quantity" value={form.quantity} onChange={handleChange} className={fieldClass} placeholder="1" />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Photo</label>
-            <label className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl cursor-pointer hover:bg-gray-100 transition">
-              <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5">Photo</label>
+            <label className="flex items-center gap-3 px-4 py-3 bg-white/[0.05] border border-white/[0.08] rounded-2xl cursor-pointer hover:bg-white/[0.08] transition">
+              <svg className="w-5 h-5 text-white/30 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span className="text-sm text-gray-400">{preview ? 'Photo sélectionnée' : 'Prendre / choisir une photo'}</span>
+              <span className="text-sm text-white/30">{preview ? 'Photo sélectionnée' : 'Prendre / choisir une photo'}</span>
               <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
             </label>
             {preview && (
@@ -225,10 +225,10 @@ export function ItemList({ listId, listName, username }: Props) {
           </div>
 
           <div className="flex gap-2 pt-1">
-            <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition">
+            <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white/50 bg-white/[0.06] hover:bg-white/[0.1] transition">
               Annuler
             </button>
-            <button type="submit" disabled={submitting} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition disabled:opacity-50">
+            <button type="submit" disabled={submitting} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition disabled:opacity-50">
               {submitting ? 'Ajout…' : 'Ajouter'}
             </button>
           </div>
@@ -236,24 +236,24 @@ export function ItemList({ listId, listName, username }: Props) {
       )}
 
       {items.length === 0 ? (
-        <p className="text-gray-400 text-sm text-center py-10">Aucun produit dans cette liste.</p>
+        <p className="text-white/30 text-sm text-center py-10">Aucun produit dans cette liste.</p>
       ) : (
         <div className="space-y-5">
           {todo.length > 0 && (
             <ul className="space-y-2 stagger">
               {todo.map((item) => (
-                <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 transition-opacity duration-200 select-none">
-                  <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-indigo-400 shrink-0 transition" />
+                <li key={item.id} className="glass rounded-2xl p-3 flex items-center gap-3 transition-opacity duration-200 select-none">
+                  <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full border-2 border-white/20 hover:border-indigo-400 shrink-0 transition" />
                   {item.photo_url && (
                     <button onClick={() => setLightbox(item.photo_url)} className="relative w-12 h-12 shrink-0 focus:outline-none">
                       <Image src={item.photo_url} alt={item.product} fill className="object-cover rounded-xl" />
                     </button>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm">{item.product}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Qté : {item.quantity}</p>
+                    <p className="font-semibold text-white text-sm">{item.product}</p>
+                    <p className="text-xs text-white/35 mt-0.5">Qté : {item.quantity}</p>
                   </div>
-                  <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition shrink-0">
+                  <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-xl text-white/20 hover:text-red-400 hover:bg-red-500/10 transition shrink-0">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -265,10 +265,10 @@ export function ItemList({ listId, listName, username }: Props) {
 
           {done.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 px-1">Achetés</p>
+              <p className="text-xs font-bold text-white/20 uppercase tracking-widest mb-2 px-1">Achetés</p>
               <ul className="space-y-2">
                 {done.map((item) => (
-                  <li key={item.id} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-3 flex items-center gap-3 opacity-50 transition-opacity duration-200 select-none">
+                  <li key={item.id} className="glass rounded-2xl p-3 flex items-center gap-3 opacity-40 transition-opacity duration-200 select-none">
                     <button onClick={() => handleToggle(item)} className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-emerald-500 shrink-0 flex items-center justify-center">
                       <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -280,10 +280,10 @@ export function ItemList({ listId, listName, username }: Props) {
                       </button>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-500 text-sm line-through">{item.product}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">Qté : {item.quantity}</p>
+                      <p className="font-semibold text-white/60 text-sm line-through">{item.product}</p>
+                      <p className="text-xs text-white/30 mt-0.5">Qté : {item.quantity}</p>
                     </div>
-                    <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition shrink-0">
+                    <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-xl text-white/20 hover:text-red-400 hover:bg-red-500/10 transition shrink-0">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -298,10 +298,11 @@ export function ItemList({ listId, listName, username }: Props) {
 
       {lightbox && createPortal(
         <div
-          className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-6 animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-6 animate-fade-in"
           onClick={() => setLightbox(null)}
         >
           <div className="relative animate-scale-in" onClick={(e) => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={lightbox}
               alt="photo produit"
@@ -309,9 +310,9 @@ export function ItemList({ listId, listName, username }: Props) {
             />
             <button
               onClick={() => setLightbox(null)}
-              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg"
+              className="absolute -top-3 -right-3 w-8 h-8 bg-white/10 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white/20 transition"
             >
-              <svg className="w-4 h-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>

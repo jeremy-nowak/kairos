@@ -25,18 +25,18 @@ export default async function DashboardPage() {
   const username = await getUsername()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relative min-h-screen">
       <Nav username={username} />
 
-      <main className="max-w-lg mx-auto px-4 pt-6 pb-28 md:pb-10">
+      <main className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-28 md:pb-10">
         <div className="mb-6 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Nouvel événement</h2>
-            <p className="text-sm text-gray-500 mt-1">Ajouté au calendrier partagé</p>
+            <h2 className="text-2xl font-bold text-white">Nouvel événement</h2>
+            <p className="text-sm text-white/40 mt-1">Ajouté au calendrier partagé</p>
           </div>
           <SchedulePhoto />
         </div>
-        <div className="bg-white rounded-3xl shadow-sm ring-1 ring-gray-100 p-5">
+        <div className="glass rounded-3xl shadow-2xl shadow-black/30 p-5">
           <EventForm username={username} />
         </div>
       </main>

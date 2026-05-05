@@ -43,18 +43,18 @@ export default async function CalendarPage() {
   const icalUrl = `webcal://${host}/api/calendar?token=${process.env.ICAL_SECRET}`
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relative min-h-screen">
       <Nav username={username} />
 
-      <main className="max-w-6xl mx-auto px-4 pt-6 pb-28 md:pb-10">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 pt-6 pb-28 md:pb-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Agenda</h2>
-            <p className="text-sm text-gray-500 mt-1">{events.length} événement{events.length !== 1 ? 's' : ''}</p>
+            <h2 className="text-2xl font-bold text-white">Agenda</h2>
+            <p className="text-sm text-white/40 mt-1">{events.length} événement{events.length !== 1 ? 's' : ''}</p>
           </div>
           <a
             href={icalUrl}
-            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl transition"
+            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/20 px-3 py-2 rounded-xl transition"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
