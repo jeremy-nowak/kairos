@@ -14,6 +14,7 @@ interface FormState {
   endTime: string
   description: string
   location: string
+  assignedTo: 'jeremy' | 'tatiana' | ''
 }
 
 const fieldClass =
@@ -43,6 +44,7 @@ export function EventForm({ username }: EventFormProps) {
     endTime: '10:00',
     description: '',
     location: '',
+    assignedTo: '',
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -66,12 +68,16 @@ export function EventForm({ username }: EventFormProps) {
     const res = await fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, username }),
+      body: JSON.stringify({
+        ...form,
+        username,
+        assignedTo: form.assignedTo || undefined,
+      }),
     })
 
     if (res.ok) {
       setSuccess(true)
-      setForm((prev) => ({ ...prev, title: '', description: '', location: '' }))
+      setForm((prev) => ({ ...prev, title: '', description: '', location: '', assignedTo: '' }))
       setTimeout(() => setSuccess(false), 4000)
     } else {
       const data = (await res.json()) as { error?: string }
@@ -176,6 +182,32 @@ export function EventForm({ username }: EventFormProps) {
           className={fieldClass}
           placeholder="Adresse, Zoom, téléphone…"
         />
+      </div>
+
+      {/* Assigné à */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          Assigné à
+        </label>
+        <div className="flex gap-2">
+          {(['jeremy', 'tatiana'] as const).map((person) => {
+            const label = person === 'jeremy' ? 'Jérémy' : 'Tatiana'
+            const isSelected = form.assignedTo === person
+            const colorClass = person === 'jeremy'
+              ? isSelected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-indigo-600 border-indigo-200 hover:border-indigo-400'
+              : isSelected ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-rose-500 border-rose-200 hover:border-rose-400'
+            return (
+              <button
+                key={person}
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, assignedTo: prev.assignedTo === person ? '' : person }))}
+                className={`flex-1 py-2.5 rounded-2xl border-2 font-semibold text-sm transition-all ${colorClass}`}
+              >
+                {label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Description */}

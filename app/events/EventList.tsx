@@ -59,6 +59,15 @@ export function EventList() {
                 <p className="text-sm text-gray-500 mt-0.5">{event.start_time} – {event.end_time}</p>
                 {event.location && <p className="text-sm text-gray-400 mt-0.5 truncate">📍 {event.location}</p>}
                 {event.description && <p className="text-sm text-gray-500 mt-1 line-clamp-2">{event.description}</p>}
+                {event.assigned_to && (
+                  <span className={`inline-block mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    event.assigned_to === 'jeremy'
+                      ? 'bg-indigo-100 text-indigo-700'
+                      : 'bg-rose-100 text-rose-700'
+                  }`}>
+                    🎯 {event.assigned_to === 'jeremy' ? 'Jérémy' : 'Tatiana'}
+                  </span>
+                )}
               </div>
               <span className="text-xs text-gray-300 shrink-0 mt-1">{event.created_by}</span>
             </div>

@@ -23,8 +23,22 @@ export async function PUT(
 
   try {
     const body = await request.json() as Record<string, unknown>
+    const assignedTo: string | null | undefined =
+      body.assignedTo === 'jeremy' || body.assignedTo === 'tatiana'
+        ? body.assignedTo
+        : 'assignedTo' in body
+          ? null
+          : undefined
     const [event] = await Promise.all([
-      updateEvent(params.id, body),
+      updateEvent(params.id, {
+        title: typeof body.title === 'string' ? body.title : undefined,
+        date: typeof body.date === 'string' ? body.date : undefined,
+        startTime: typeof body.startTime === 'string' ? body.startTime : undefined,
+        endTime: typeof body.endTime === 'string' ? body.endTime : undefined,
+        description: typeof body.description === 'string' ? body.description : undefined,
+        location: typeof body.location === 'string' ? body.location : undefined,
+        assignedTo,
+      }),
       typeof body.location === 'string' && body.location ? upsertEventLocation(body.location) : Promise.resolve(),
     ])
     return NextResponse.json(event)

@@ -47,6 +47,7 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
     endTime: event.end_time.substring(0, 5),
     location: event.location ?? '',
     description: event.description ?? '',
+    assignedTo: (event.assigned_to ?? '') as 'jeremy' | 'tatiana' | '',
   })
 
   const colors = getUserColor(event.created_by)
@@ -67,7 +68,10 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
     const res = await fetch(`/api/events/${event.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        assignedTo: form.assignedTo || null,
+      }),
     })
     if (res.ok) {
       const updated = await res.json() as Event
@@ -145,6 +149,28 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Description</label>
               <textarea name="description" value={form.description} onChange={handleChange} rows={2} className={`${fieldClass} resize-none`} placeholder="Notes…" />
             </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Assigné à</label>
+              <div className="flex gap-2">
+                {(['jeremy', 'tatiana'] as const).map((person) => {
+                  const label = person === 'jeremy' ? 'Jérémy' : 'Tatiana'
+                  const isSelected = form.assignedTo === person
+                  const colorClass = person === 'jeremy'
+                    ? isSelected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-indigo-600 border-indigo-200 hover:border-indigo-400'
+                    : isSelected ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-rose-500 border-rose-200 hover:border-rose-400'
+                  return (
+                    <button
+                      key={person}
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, assignedTo: prev.assignedTo === person ? '' : person }))}
+                      className={`flex-1 py-2 rounded-xl border-2 font-semibold text-sm transition-all ${colorClass}`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
             <div className="flex gap-2 pt-1">
               <button onClick={() => setEditing(false)} className="flex-1 py-2.5 rounded-2xl text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition">
                 Annuler
@@ -193,6 +219,20 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
                   {event.created_by}
                 </span>
               </div>
+              {event.assigned_to && (
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    event.assigned_to === 'jeremy'
+                      ? 'bg-indigo-100 text-indigo-700'
+                      : 'bg-rose-100 text-rose-700'
+                  }`}>
+                    {event.assigned_to === 'jeremy' ? '🎯 Jérémy' : '🎯 Tatiana'}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2 mt-6">

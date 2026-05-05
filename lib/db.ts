@@ -9,6 +9,7 @@ export interface Event {
   description: string | null
   location: string | null
   created_by: string
+  assigned_to: string | null
   created_at: string
 }
 
@@ -20,6 +21,7 @@ export interface CreateEventInput {
   description?: string
   location?: string
   createdBy: string
+  assignedTo?: string | null
 }
 
 export async function createEvent(input: CreateEventInput): Promise<Event> {
@@ -33,6 +35,7 @@ export async function createEvent(input: CreateEventInput): Promise<Event> {
       description: input.description ?? null,
       location: input.location ?? null,
       created_by: input.createdBy,
+      assigned_to: input.assignedTo ?? null,
     })
     .select()
     .single()
@@ -62,6 +65,7 @@ export async function updateEvent(id: string, input: Partial<CreateEventInput>):
       ...(input.endTime !== undefined && { end_time: input.endTime }),
       ...(input.description !== undefined && { description: input.description ?? null }),
       ...(input.location !== undefined && { location: input.location ?? null }),
+      ...(input.assignedTo !== undefined && { assigned_to: input.assignedTo ?? null }),
     })
     .eq('id', id)
     .select()

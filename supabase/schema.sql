@@ -8,8 +8,11 @@ CREATE TABLE events (
   description TEXT,
   location    TEXT,
   created_by  TEXT        NOT NULL,
+  assigned_to TEXT,
   created_at  TIMESTAMPTZ DEFAULT now()
 );
+
+-- Migration : ALTER TABLE events ADD COLUMN assigned_to TEXT;
 
 CREATE INDEX events_date_idx ON events (date, start_time);
 

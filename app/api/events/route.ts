@@ -41,7 +41,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
   }
 
-  const { title, date, startTime, endTime, description, location, username } = parsed.data
+  const { title, date, startTime, endTime, description, location, username, assignedTo } = parsed.data
 
   const displayDate = new Date(`${date}T12:00:00`).toLocaleDateString('fr-FR', {
     weekday: 'long',
@@ -53,8 +53,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   try {
     const upsertOps: Promise<unknown>[] = [
-      createEvent({ title, date, startTime, endTime, description, location, createdBy: username }),
-      sendDiscordNotification({ username, title, date: displayDate, startTime, endTime, description, location }),
+      createEvent({ title, date, startTime, endTime, description, location, createdBy: username, assignedTo }),
+      sendDiscordNotification({ username, title, date: displayDate, startTime, endTime, description, location, assignedTo }),
     ]
     if (location) upsertOps.push(upsertEventLocation(location))
     await Promise.all(upsertOps)

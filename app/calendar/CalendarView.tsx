@@ -41,6 +41,12 @@ export function CalendarView({ events: initialEvents }: CalendarViewProps) {
     extendedProps: { raw: event },
   }))
 
+  function getAssigneeLabel(assignedTo: string | null): string | null {
+    if (assignedTo === 'jeremy') return '🎯 J'
+    if (assignedTo === 'tatiana') return '🎯 T'
+    return null
+  }
+
   return (
     <>
       {selectedEvent && (
@@ -67,11 +73,16 @@ export function CalendarView({ events: initialEvents }: CalendarViewProps) {
           height="auto"
           eventDisplay="block"
           eventClick={(info) => setSelectedEvent(info.event.extendedProps.raw as Event)}
-          eventContent={(arg) => (
-            <div className="px-1 py-0.5 text-xs truncate font-medium cursor-pointer">
-              {arg.event.title}
-            </div>
-          )}
+          eventContent={(arg) => {
+            const raw = arg.event.extendedProps.raw as Event
+            const assigneeLabel = getAssigneeLabel(raw.assigned_to)
+            return (
+              <div className="px-1 py-0.5 text-xs truncate font-medium cursor-pointer flex items-center gap-1">
+                {assigneeLabel && <span className="shrink-0">{assigneeLabel}</span>}
+                <span className="truncate">{arg.event.title}</span>
+              </div>
+            )
+          }}
         />
       </div>
     </>
