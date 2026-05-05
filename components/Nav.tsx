@@ -12,12 +12,17 @@ function KairosIcon({ size = 28 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="ki-g" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#6366f1" />
+          <stop stopColor="#4338ca" />
           <stop offset="1" stopColor="#7c3aed" />
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="8" fill="url(#ki-g)" />
-      <path d="M11 9v14M11 16l8-7M11 16l8 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 9L23 9L16 16L23 23L9 23L16 16Z" fill="none" stroke="white" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M8.5 9H23.5" stroke="white" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M8.5 23H23.5" stroke="white" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M10.5 10.5L21.5 10.5L16 15.3Z" fill="white" fillOpacity="0.9" />
+      <path d="M13 21.5L19 21.5L16 18.8Z" fill="white" fillOpacity="0.4" />
+      <circle cx="16" cy="16" r="2.1" fill="white" />
     </svg>
   )
 }

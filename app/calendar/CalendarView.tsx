@@ -15,9 +15,9 @@ interface CalendarViewProps {
 function getEventColor(event: Event): string {
   if (event.assigned_to) {
     const people = event.assigned_to.split(',').filter(Boolean)
-    if (people.length >= 2) return '#8b5cf6'       // les deux → violet
-    if (people[0] === 'jeremy')  return '#6366f1'  // Jérémy → indigo
-    if (people[0] === 'tatiana') return '#f43f5e'  // Tatiana → rose
+    if (people.length >= 2) return '#e879f9'       // les deux → fuchsia
+    if (people[0] === 'jeremy')  return '#818cf8'  // Jérémy → indigo clair
+    if (people[0] === 'tatiana') return '#fb7185'  // Tatiana → rose clair
   }
   switch (event.created_by.toLowerCase()) {
     case 'tatiana': return '#f43f5e'

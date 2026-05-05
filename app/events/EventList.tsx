@@ -7,8 +7,8 @@ import { EventModal } from '@/components/EventModal'
 function getAccentColor(assignedTo: string | null): string | null {
   if (!assignedTo) return null
   const people = assignedTo.split(',').filter(Boolean)
-  if (people.length >= 2) return '#8b5cf6'
-  return people[0] === 'jeremy' ? '#6366f1' : '#f43f5e'
+  if (people.length >= 2) return '#e879f9'   // fuchsia vif — les deux
+  return people[0] === 'jeremy' ? '#818cf8' : '#fb7185'  // indigo clair / rose clair
 }
 
 function formatDate(dateStr: string): string {
