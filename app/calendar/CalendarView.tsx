@@ -12,8 +12,14 @@ interface CalendarViewProps {
   events: Event[]
 }
 
-function getUserColor(username: string) {
-  switch (username.toLowerCase()) {
+function getEventColor(event: Event): string {
+  if (event.assigned_to) {
+    const people = event.assigned_to.split(',').filter(Boolean)
+    if (people.length >= 2) return '#8b5cf6'       // les deux → violet
+    if (people[0] === 'jeremy')  return '#6366f1'  // Jérémy → indigo
+    if (people[0] === 'tatiana') return '#f43f5e'  // Tatiana → rose
+  }
+  switch (event.created_by.toLowerCase()) {
     case 'tatiana': return '#f43f5e'
     case 'jeremy':  return '#6366f1'
     default:        return '#8b5cf6'
@@ -37,7 +43,7 @@ export function CalendarView({ events: initialEvents }: CalendarViewProps) {
     title: event.title,
     start: `${event.date}T${event.start_time}`,
     end: `${event.date}T${event.end_time}`,
-    color: getUserColor(event.created_by),
+    color: getEventColor(event),
     extendedProps: { raw: event },
   }))
 
