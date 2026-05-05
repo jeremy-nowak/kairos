@@ -65,25 +65,30 @@ export function EventForm({ username }: EventFormProps) {
     setSuccess(false)
     setError('')
 
-    const res = await fetch('/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        username,
-        assignedTo: form.assignedTo || undefined,
-      }),
-    })
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          username,
+          assignedTo: form.assignedTo || undefined,
+        }),
+      })
 
-    if (res.ok) {
-      setSuccess(true)
-      setForm((prev) => ({ ...prev, title: '', description: '', location: '', assignedTo: '' }))
-      setTimeout(() => setSuccess(false), 4000)
-    } else {
-      const data = (await res.json()) as { error?: string }
-      setError(data.error ?? 'Une erreur est survenue')
+      if (res.ok) {
+        setSuccess(true)
+        setForm((prev) => ({ ...prev, title: '', description: '', location: '', assignedTo: '' }))
+        setTimeout(() => setSuccess(false), 4000)
+      } else {
+        const data = (await res.json()) as { error?: string }
+        setError(data.error ?? 'Une erreur est survenue')
+      }
+    } catch {
+      setError('Impossible de contacter le serveur')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (

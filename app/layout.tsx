@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import { PageTransition } from '@/components/PageTransition'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -19,7 +20,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className={`${inter.className} min-h-screen`}>{children}</body>
+      <body className={`${inter.className} min-h-screen`}>
+        <PageTransition>{children}</PageTransition>
+      </body>
     </html>
   )
 }

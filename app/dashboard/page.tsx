@@ -3,6 +3,7 @@ import { jwtVerify } from 'jose'
 import { redirect } from 'next/navigation'
 import { Nav } from '@/components/Nav'
 import { EventForm } from './EventForm'
+import { SchedulePhoto } from './SchedulePhoto'
 
 async function getUsername(): Promise<string> {
   const cookieStore = cookies()
@@ -28,9 +29,12 @@ export default async function DashboardPage() {
       <Nav username={username} />
 
       <main className="max-w-lg mx-auto px-4 pt-6 pb-28 md:pb-10">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Nouvel événement</h2>
-          <p className="text-sm text-gray-500 mt-1">Ajouté au calendrier partagé</p>
+        <div className="mb-6 flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Nouvel événement</h2>
+            <p className="text-sm text-gray-500 mt-1">Ajouté au calendrier partagé</p>
+          </div>
+          <SchedulePhoto />
         </div>
         <div className="bg-white rounded-3xl shadow-sm ring-1 ring-gray-100 p-5">
           <EventForm username={username} />
