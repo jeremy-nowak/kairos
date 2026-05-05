@@ -23,12 +23,15 @@ export async function PUT(
 
   try {
     const body = await request.json() as Record<string, unknown>
-    const assignedTo: string | null | undefined =
-      body.assignedTo === 'jeremy' || body.assignedTo === 'tatiana'
-        ? body.assignedTo
-        : 'assignedTo' in body
-          ? null
-          : undefined
+    let assignedTo: string | null | undefined = undefined
+    if ('assignedTo' in body) {
+      if (Array.isArray(body.assignedTo)) {
+        const valid = (body.assignedTo as unknown[]).filter(v => v === 'jeremy' || v === 'tatiana') as string[]
+        assignedTo = valid.length > 0 ? valid.join(',') : null
+      } else {
+        assignedTo = null
+      }
+    }
     const [event] = await Promise.all([
       updateEvent(params.id, {
         title: typeof body.title === 'string' ? body.title : undefined,

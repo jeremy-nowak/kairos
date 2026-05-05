@@ -5,18 +5,20 @@
 /* ── Dark base ────────────────────────────────────────────────────────────── */
 
 body {
-  background-color: #0b0c11;
+  background-color: #080a12;
   color: white;
 }
 
-/* Subtle ambient glow */
+/* Ambient color blobs — visible through glass panels */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 50% at 15% -10%, rgba(99,102,241,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 85% 105%, rgba(139,92,246,0.12) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 70% at -5% -5%, rgba(124,58,237,0.55) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 105% 100%, rgba(79,70,229,0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 40% at 55% 15%, rgba(99,102,241,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 25% 30% at 80% 60%, rgba(139,92,246,0.15) 0%, transparent 55%);
   pointer-events: none;
   z-index: 0;
 }
@@ -24,23 +26,29 @@ body::before {
 /* ── Glass utilities ──────────────────────────────────────────────────────── */
 
 .glass {
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow:
+    0 4px 32px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .glass-strong {
-  background: rgba(15,16,28,0.88);
-  border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  background: rgba(12,13,22,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(32px) saturate(160%);
+  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  box-shadow:
+    0 8px 48px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .glass-nav {
-  background: rgba(11,12,17,0.82);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  background: rgba(8,10,18,0.65);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
 }
 
 /* ── Glass form inputs ────────────────────────────────────────────────────── */
@@ -127,12 +135,29 @@ input[type="date"].glass-input::-webkit-calendar-picker-indicator { filter: inve
 
 /* ── FullCalendar dark theme ──────────────────────────────────────────────── */
 
+/* Kill ALL white backgrounds FullCalendar might inject */
+.fc,
+.fc *,
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc .fc-scrollgrid,
+.fc .fc-scrollgrid-section > td,
+.fc .fc-scrollgrid-section > th {
+  background: transparent !important;
+}
+
 .fc { color: rgba(255,255,255,0.82) !important; }
-.fc .fc-scrollgrid { border-color: rgba(255,255,255,0.07) !important; }
-.fc td, .fc th { border-color: rgba(255,255,255,0.07) !important; }
-.fc .fc-daygrid-day { background: transparent !important; }
-.fc .fc-day-other { background: rgba(0,0,0,0.12) !important; }
-.fc .fc-day-other .fc-daygrid-day-number { opacity: 0.3 !important; }
+
+.fc .fc-scrollgrid,
+.fc-theme-standard .fc-scrollgrid {
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
+.fc td, .fc th {
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
+.fc .fc-day-other .fc-daygrid-day-number { opacity: 0.25 !important; }
 
 .fc .fc-button {
   border-radius: 10px !important;
@@ -142,19 +167,24 @@ input[type="date"].glass-input::-webkit-calendar-picker-indicator { filter: inve
 }
 
 .fc .fc-button-primary {
-  background-color: rgba(99,102,241,0.75) !important;
+  background: rgba(99,102,241,0.8) !important;
   border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .fc .fc-button-primary:hover {
-  background-color: #6366f1 !important;
+  background: rgba(99,102,241,1) !important;
   border-color: transparent !important;
 }
 
+.fc .fc-button-primary:not(:disabled):active,
 .fc .fc-button-primary:not(:disabled).fc-button-active {
-  background-color: #4f46e5 !important;
+  background: #4f46e5 !important;
   border-color: transparent !important;
+  box-shadow: none !important;
 }
+
+.fc .fc-button-primary:focus { box-shadow: none !important; }
 
 .fc .fc-toolbar-title {
   font-size: 1.1rem !important;
@@ -170,7 +200,7 @@ input[type="date"].glass-input::-webkit-calendar-picker-indicator { filter: inve
 
 .fc .fc-daygrid-day-number {
   font-size: 0.85rem !important;
-  color: rgba(255,255,255,0.45) !important;
+  color: rgba(255,255,255,0.4) !important;
 }
 
 .fc .fc-col-header-cell-cushion {
@@ -178,11 +208,11 @@ input[type="date"].glass-input::-webkit-calendar-picker-indicator { filter: inve
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-  color: rgba(255,255,255,0.3) !important;
+  color: rgba(255,255,255,0.28) !important;
 }
 
 .fc .fc-daygrid-day.fc-day-today {
-  background-color: rgba(99,102,241,0.14) !important;
+  background: rgba(99,102,241,0.14) !important;
 }
 
 .fc .fc-day-today .fc-daygrid-day-number {

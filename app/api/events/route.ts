@@ -52,9 +52,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   })
 
   try {
+    const assignedToStr = assignedTo && assignedTo.length > 0 ? assignedTo.join(',') : undefined
     const upsertOps: Promise<unknown>[] = [
-      createEvent({ title, date, startTime, endTime, description, location, createdBy: username, assignedTo }),
-      sendDiscordNotification({ username, title, date: displayDate, startTime, endTime, description, location, assignedTo }),
+      createEvent({ title, date, startTime, endTime, description, location, createdBy: username, assignedTo: assignedToStr }),
+      sendDiscordNotification({ username, title, date: displayDate, startTime, endTime, description, location, assignedTo: assignedToStr }),
     ]
     if (location) upsertOps.push(upsertEventLocation(location))
     await Promise.all(upsertOps)

@@ -15,7 +15,7 @@ interface FormState {
   endTime: string
   description: string
   location: string
-  assignedTo: 'jeremy' | 'tatiana' | ''
+  assignedTo: ('jeremy' | 'tatiana')[]
 }
 
 const fieldClass =
@@ -46,7 +46,7 @@ export function EventForm({ username }: EventFormProps) {
     endTime: '10:00',
     description: '',
     location: '',
-    assignedTo: '',
+    assignedTo: [],
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -72,7 +72,7 @@ export function EventForm({ username }: EventFormProps) {
         body: JSON.stringify({
           ...form,
           username,
-          assignedTo: form.assignedTo || undefined,
+          assignedTo: form.assignedTo.length > 0 ? form.assignedTo : undefined,
         }),
       })
 
@@ -185,7 +185,7 @@ export function EventForm({ username }: EventFormProps) {
         <div className="flex gap-2">
           {(['jeremy', 'tatiana'] as const).map((person) => {
             const label = person === 'jeremy' ? 'Jérémy' : 'Tatiana'
-            const isSelected = form.assignedTo === person
+            const isSelected = form.assignedTo.includes(person)
             const colorClass = person === 'jeremy'
               ? isSelected
                 ? 'bg-indigo-600 text-white border-indigo-500'
@@ -197,7 +197,10 @@ export function EventForm({ username }: EventFormProps) {
               <button
                 key={person}
                 type="button"
-                onClick={() => setForm((prev) => ({ ...prev, assignedTo: prev.assignedTo === person ? '' : person }))}
+                onClick={() => setForm((prev) => {
+                  const has = prev.assignedTo.includes(person)
+                  return { ...prev, assignedTo: has ? prev.assignedTo.filter(p => p !== person) : [...prev.assignedTo, person] }
+                })}
                 className={`flex-1 py-2.5 rounded-2xl border-2 font-semibold text-sm transition-all ${colorClass}`}
               >
                 {label}

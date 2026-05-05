@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Kairos',
   description: 'Calendrier partagé avec notifications Discord',
+  icons: { icon: '/favicon.svg' },
 }
 
 export const viewport: Viewport = {

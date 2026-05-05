@@ -6,11 +6,13 @@ function getUserColor(username: string): number {
   }
 }
 
-function getAssigneeMention(assignedTo: string): string {
-  if (assignedTo === 'jeremy') {
-    return process.env.DISCORD_MENTION_JEREMY ?? '@vitaly'
-  }
+function getMention(person: string): string {
+  if (person === 'jeremy') return process.env.DISCORD_MENTION_JEREMY ?? '@vitaly'
   return process.env.DISCORD_MENTION_TATIANA ?? '@tatiana'
+}
+
+function getLabel(person: string): string {
+  return person === 'jeremy' ? 'Jérémy' : 'Tatiana'
 }
 
 export async function sendDiscordNotification({
@@ -32,14 +34,16 @@ export async function sendDiscordNotification({
   location?: string
   assignedTo?: string
 }) {
+  const assignees = assignedTo ? assignedTo.split(',').filter(Boolean) : []
+
   const fields = [
     { name: '👤 Créé par', value: `**${username}**`, inline: true },
     { name: '📆 Date',     value: `**${date}**`,     inline: true },
     { name: '⏰ Horaire',  value: `**${startTime} → ${endTime}**`, inline: true },
   ]
 
-  if (assignedTo) {
-    const label = assignedTo === 'jeremy' ? 'Jérémy' : 'Tatiana'
+  if (assignees.length > 0) {
+    const label = assignees.map(getLabel).join(' & ')
     fields.push({ name: '🎯 Assigné à', value: `**${label}**`, inline: true })
   }
 
@@ -51,13 +55,16 @@ export async function sendDiscordNotification({
     fields.push({ name: '📝 Description', value: description, inline: false })
   }
 
-  const mention = assignedTo ? getAssigneeMention(assignedTo) : undefined
+  const mentions = assignees.map(getMention)
+  const content = mentions.length > 0
+    ? `${mentions.join(' ')} — nouvelle tâche assignée !`
+    : undefined
 
   await fetch(process.env.DISCORD_WEBHOOK_URL!, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      content: mention ? `${mention} — nouvelle tâche assignée !` : undefined,
+      content,
       embeds: [
         {
           title: `📅  Nouvel événement — ${title}`,

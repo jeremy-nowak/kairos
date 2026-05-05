@@ -13,7 +13,7 @@ export const createEventSchema = z.object({
   description: z.string().max(2000).optional(),
   location: z.string().max(200).optional(),
   username: z.string().min(1).max(50),
-  assignedTo: z.enum(['jeremy', 'tatiana']).optional(),
+  assignedTo: z.array(z.enum(['jeremy', 'tatiana'])).optional(),
 })
 
 export type LoginInput = z.infer<typeof loginSchema>

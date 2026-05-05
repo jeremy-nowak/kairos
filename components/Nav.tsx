@@ -7,6 +7,21 @@ interface NavProps {
   username: string
 }
 
+function KairosIcon({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ki-g" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#6366f1" />
+          <stop offset="1" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="8" fill="url(#ki-g)" />
+      <path d="M11 9v14M11 16l8-7M11 16l8 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function PlusIcon({ active }: { active: boolean }) {
   return (
     <svg className={`w-6 h-6 transition-colors ${active ? 'text-indigo-400' : 'text-white/30'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -69,8 +84,8 @@ export function Nav({ username }: NavProps) {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2.5">
-              <span className="text-xl">📅</span>
-              <span className="font-bold text-white text-lg">Kairos</span>
+              <KairosIcon size={28} />
+              <span className="font-bold text-white text-lg tracking-tight">Kairos</span>
             </div>
             <nav className="flex items-center gap-1">
               {([
@@ -114,8 +129,8 @@ export function Nav({ username }: NavProps) {
       {/* ── Mobile top bar ── */}
       <header className="md:hidden glass-nav border-b border-white/[0.06] px-4 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📅</span>
-          <span className="font-bold text-white">Kairos</span>
+          <KairosIcon size={24} />
+          <span className="font-bold text-white tracking-tight">Kairos</span>
         </div>
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-2 bg-white/[0.07] rounded-full px-3 py-1.5">

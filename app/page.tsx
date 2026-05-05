@@ -38,8 +38,17 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm z-10">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 glass rounded-3xl mb-5 shadow-xl shadow-indigo-950/50">
-            <span className="text-4xl">📅</span>
+          <div className="inline-flex items-center justify-center mb-5">
+            <svg width="72" height="72" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="login-g" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#6366f1" />
+                  <stop offset="1" stopColor="#7c3aed" />
+                </linearGradient>
+              </defs>
+              <rect width="32" height="32" rx="10" fill="url(#login-g)" />
+              <path d="M11 9v14M11 16l8-7M11 16l8 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">Kairos</h1>
           <p className="text-white/40 text-sm mt-1.5">Calendrier partagé · Notifications Discord</p>

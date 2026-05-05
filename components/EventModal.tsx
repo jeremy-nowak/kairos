@@ -47,7 +47,7 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
     endTime: event.end_time.substring(0, 5),
     location: event.location ?? '',
     description: event.description ?? '',
-    assignedTo: (event.assigned_to ?? '') as 'jeremy' | 'tatiana' | '',
+    assignedTo: (event.assigned_to ? event.assigned_to.split(',').filter(Boolean) : []) as ('jeremy' | 'tatiana')[],
   })
 
   const colors = getUserColor(event.created_by)
@@ -70,7 +70,7 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...form,
-        assignedTo: form.assignedTo || null,
+        assignedTo: form.assignedTo.length > 0 ? form.assignedTo : null,
       }),
     })
     if (res.ok) {
@@ -154,7 +154,7 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
               <div className="flex gap-2">
                 {(['jeremy', 'tatiana'] as const).map((person) => {
                   const label = person === 'jeremy' ? 'Jérémy' : 'Tatiana'
-                  const isSelected = form.assignedTo === person
+                  const isSelected = form.assignedTo.includes(person)
                   const colorClass = person === 'jeremy'
                     ? isSelected
                       ? 'bg-indigo-600 text-white border-indigo-500'
@@ -166,7 +166,10 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
                     <button
                       key={person}
                       type="button"
-                      onClick={() => setForm((prev) => ({ ...prev, assignedTo: prev.assignedTo === person ? '' : person }))}
+                      onClick={() => setForm((prev) => {
+                        const has = prev.assignedTo.includes(person)
+                        return { ...prev, assignedTo: has ? prev.assignedTo.filter(p => p !== person) : [...prev.assignedTo, person] }
+                      })}
                       className={`flex-1 py-2 rounded-xl border-2 font-semibold text-sm transition-all ${colorClass}`}
                     >
                       {label}
@@ -228,13 +231,15 @@ export function EventModal({ event, onClose, onDelete, onUpdate }: Props) {
                   <svg className="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    event.assigned_to === 'jeremy'
-                      ? 'bg-indigo-500/20 text-indigo-400'
-                      : 'bg-rose-500/20 text-rose-400'
-                  }`}>
-                    {event.assigned_to === 'jeremy' ? '🎯 Jérémy' : '🎯 Tatiana'}
-                  </span>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {event.assigned_to.split(',').filter(Boolean).map((person) => (
+                      <span key={person} className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        person === 'jeremy' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-rose-500/20 text-rose-400'
+                      }`}>
+                        🎯 {person === 'jeremy' ? 'Jérémy' : 'Tatiana'}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -42,9 +42,11 @@ export function CalendarView({ events: initialEvents }: CalendarViewProps) {
   }))
 
   function getAssigneeLabel(assignedTo: string | null): string | null {
-    if (assignedTo === 'jeremy') return '🎯 J'
-    if (assignedTo === 'tatiana') return '🎯 T'
-    return null
+    if (!assignedTo) return null
+    const people = assignedTo.split(',').filter(Boolean)
+    if (people.length === 0) return null
+    const initials = people.map(p => p === 'jeremy' ? 'J' : 'T').join('&')
+    return `🎯 ${initials}`
   }
 
   return (

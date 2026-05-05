@@ -60,13 +60,15 @@ export function EventList() {
                 {event.location && <p className="text-sm text-white/30 mt-0.5 truncate">📍 {event.location}</p>}
                 {event.description && <p className="text-sm text-white/40 mt-1 line-clamp-2">{event.description}</p>}
                 {event.assigned_to && (
-                  <span className={`inline-block mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    event.assigned_to === 'jeremy'
-                      ? 'bg-indigo-500/20 text-indigo-400'
-                      : 'bg-rose-500/20 text-rose-400'
-                  }`}>
-                    🎯 {event.assigned_to === 'jeremy' ? 'Jérémy' : 'Tatiana'}
-                  </span>
+                  <div className="flex gap-1.5 flex-wrap mt-1.5">
+                    {event.assigned_to.split(',').filter(Boolean).map((person) => (
+                      <span key={person} className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        person === 'jeremy' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-rose-500/20 text-rose-400'
+                      }`}>
+                        🎯 {person === 'jeremy' ? 'Jérémy' : 'Tatiana'}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
               <span className="text-xs text-white/20 shrink-0 mt-1">{event.created_by}</span>
