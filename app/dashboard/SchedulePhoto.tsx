@@ -1,31 +1,25 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
+import { useState, useRef } from 'react'
+
+type Status = 'loading' | 'loaded' | 'empty'
 
 export function SchedulePhoto() {
   const [open, setOpen] = useState(false)
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<Status>('loading')
+  const [imgKey, setImgKey] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  async function fetchPhoto() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/schedule-photo')
-      const data = await res.json() as { url: string | null }
-      setPhotoUrl(data.url)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   function handleOpen() {
     setOpen(true)
+    setStatus('loading')
     setError('')
-    fetchPhoto()
+  }
+
+  function handleClose() {
+    setOpen(false)
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -45,7 +39,8 @@ export function SchedulePhoto() {
       if (!res.ok) {
         setError(data.error ?? 'Une erreur est survenue')
       } else {
-        await fetchPhoto()
+        setStatus('loading')
+        setImgKey((k) => k + 1)
       }
     } catch {
       setError('Impossible de contacter le serveur')
@@ -55,17 +50,12 @@ export function SchedulePhoto() {
     }
   }
 
-  useEffect(() => {
-    if (!open) setPhotoUrl(null)
-  }, [open])
-
   return (
     <>
       <button
         type="button"
         onClick={handleOpen}
-        title="Voir mon planning"
-        className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition"
+        className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition shrink-0"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6M3 21h18M3 10l9-7 9 7" />
@@ -74,7 +64,7 @@ export function SchedulePhoto() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in" onClick={handleClose}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div
             className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg z-10 overflow-hidden animate-scale-in"
@@ -90,9 +80,9 @@ export function SchedulePhoto() {
                   disabled={uploading}
                   className="text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition disabled:opacity-50"
                 >
-                  {uploading ? 'Upload…' : photoUrl ? 'Remplacer' : 'Ajouter une photo'}
+                  {uploading ? 'Upload…' : status === 'loaded' ? 'Remplacer' : 'Ajouter une photo'}
                 </button>
-                <button onClick={() => setOpen(false)} className="p-1.5 rounded-xl hover:bg-gray-100 transition">
+                <button onClick={handleClose} className="p-1.5 rounded-xl hover:bg-gray-100 transition">
                   <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -106,24 +96,27 @@ export function SchedulePhoto() {
                 <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2 mb-3">⚠️ {error}</p>
               )}
 
-              {loading ? (
+              {/* L'image est proxiée par /api/schedule-photo — pas d'URL signée éphémère côté client */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                key={imgKey}
+                src="/api/schedule-photo"
+                alt="Planning professionnel"
+                onLoad={() => setStatus('loaded')}
+                onError={() => setStatus('empty')}
+                className={`w-full rounded-2xl object-contain max-h-[60vh] ${status === 'loaded' ? 'block' : 'hidden'}`}
+              />
+
+              {status === 'loading' && (
                 <div className="flex items-center justify-center py-20">
                   <svg className="animate-spin h-7 w-7 text-indigo-400" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                 </div>
-              ) : photoUrl ? (
-                <div className="relative w-full rounded-2xl overflow-hidden bg-gray-50" style={{ minHeight: 300 }}>
-                  <Image
-                    src={photoUrl}
-                    alt="Planning professionnel"
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 512px) 100vw, 512px"
-                  />
-                </div>
-              ) : (
+              )}
+
+              {status === 'empty' && (
                 <button
                   type="button"
                   onClick={() => inputRef.current?.click()}

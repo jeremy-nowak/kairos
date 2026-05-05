@@ -16,16 +16,26 @@ async function verifySession(request: NextRequest): Promise<boolean> {
   }
 }
 
+// Proxy l'image directement — évite les URL signées éphémères côté client
 export async function GET(request: NextRequest): Promise<NextResponse> {
   if (!(await verifySession(request))) {
-    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+    return new NextResponse(null, { status: 401 })
   }
 
-  const { data } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(FILE_PATH, 3600)
+  const { data, error } = await supabase.storage.from(BUCKET).download(FILE_PATH)
 
-  return NextResponse.json({ url: data?.signedUrl ?? null })
+  if (error || !data) {
+    return new NextResponse(null, { status: 404 })
+  }
+
+  const buffer = Buffer.from(await data.arrayBuffer())
+
+  return new NextResponse(buffer, {
+    headers: {
+      'Content-Type': data.type,
+      'Cache-Control': 'private, no-cache',
+    },
+  })
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

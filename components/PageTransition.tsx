@@ -37,5 +37,5 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
     el.classList.add(cls)
   }, [pathname])
 
-  return <div ref={containerRef} style={{ overflowX: 'clip' }}>{children}</div>
+  return <div ref={containerRef}>{children}</div>
 }
