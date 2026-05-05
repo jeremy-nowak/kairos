@@ -45,17 +45,17 @@
 /* ── Transitions de pages ─────────────────────────────────────────────────── */
 
 @keyframes page-from-right {
-  from { opacity: 0; transform: translateX(18px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { transform: translateX(22px); }
+  to   { transform: translateX(0); }
 }
 
 @keyframes page-from-left {
-  from { opacity: 0; transform: translateX(-18px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { transform: translateX(-22px); }
+  to   { transform: translateX(0); }
 }
 
-.page-from-right { animation: page-from-right 0.26s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
-.page-from-left  { animation: page-from-left  0.26s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.page-from-right { animation: page-from-right 0.24s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.page-from-left  { animation: page-from-left  0.24s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
 .page-fade       { animation: fade-in          0.2s  ease both; }
 
 /* Safe area for iPhone bottom bar */
