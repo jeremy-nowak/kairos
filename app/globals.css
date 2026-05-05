@@ -135,14 +135,17 @@ input[type="date"].glass-input::-webkit-calendar-picker-indicator { filter: inve
 
 /* ── FullCalendar dark theme ──────────────────────────────────────────────── */
 
-/* Kill ALL white backgrounds FullCalendar might inject */
+/* Kill white backgrounds — do NOT include .fc-event or its children */
 .fc,
-.fc *,
 .fc-theme-standard td,
 .fc-theme-standard th,
 .fc .fc-scrollgrid,
 .fc .fc-scrollgrid-section > td,
-.fc .fc-scrollgrid-section > th {
+.fc .fc-scrollgrid-section > th,
+.fc .fc-daygrid-body,
+.fc .fc-daygrid-body table,
+.fc .fc-scrollgrid-sync-table,
+.fc .fc-col-header {
   background: transparent !important;
 }
 

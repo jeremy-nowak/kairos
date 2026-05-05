@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react'
 import type { Event } from '@/lib/db'
 import { EventModal } from '@/components/EventModal'
 
+function getAccentColor(assignedTo: string | null): string | null {
+  if (!assignedTo) return null
+  const people = assignedTo.split(',').filter(Boolean)
+  if (people.length >= 2) return '#8b5cf6'
+  return people[0] === 'jeremy' ? '#6366f1' : '#f43f5e'
+}
+
 function formatDate(dateStr: string): string {
   return new Date(`${dateStr}T12:00:00`).toLocaleDateString('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -50,6 +57,9 @@ export function EventList() {
           <li
             key={event.id}
             onClick={() => setSelectedEvent(event)}
+            style={getAccentColor(event.assigned_to) ? {
+              boxShadow: `inset 3px 0 0 ${getAccentColor(event.assigned_to)}, 0 4px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)`,
+            } : undefined}
             className="glass rounded-2xl p-4 cursor-pointer active:scale-[0.97] transition-all duration-150 hover:border-white/[0.14]"
           >
             <div className="flex items-start justify-between gap-2">
