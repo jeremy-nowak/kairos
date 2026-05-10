@@ -55,6 +55,12 @@ export async function getEvents(): Promise<Event[]> {
   return (data ?? []) as Event[]
 }
 
+export async function deletePastEvents(): Promise<void> {
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' })
+  const { error } = await supabase.from('events').delete().lt('date', today)
+  if (error) throw error
+}
+
 export async function updateEvent(id: string, input: Partial<CreateEventInput>): Promise<Event> {
   const { data, error } = await supabase
     .from('events')

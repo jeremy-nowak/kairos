@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { createEventSchema } from '@/lib/validators'
-import { createEvent, getEvents, upsertEventLocation } from '@/lib/db'
+import { createEvent, deletePastEvents, getEvents, upsertEventLocation } from '@/lib/db'
 import { sendDiscordNotification } from '@/lib/discord'
 import { logger } from '@/lib/logger'
 
@@ -22,6 +22,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
+    await deletePastEvents()
     const events = await getEvents()
     return NextResponse.json(events)
   } catch {

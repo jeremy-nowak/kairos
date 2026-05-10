@@ -4,9 +4,9 @@ import { useState, ChangeEvent } from 'react'
 import type { Event } from '@/lib/db'
 import { LocationInput } from '@/components/LocationInput'
 
-const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
-  const h = Math.floor(i / 2)
-  const m = i % 2 === 0 ? '00' : '30'
+const TIME_SLOTS = Array.from({ length: 96 }, (_, i) => {
+  const h = Math.floor(i / 4)
+  const m = ['00', '15', '30', '45'][i % 4]
   return `${String(h).padStart(2, '0')}:${m}`
 })
 

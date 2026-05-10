@@ -21,9 +21,9 @@ interface FormState {
 const fieldClass =
   'glass-input w-full px-4 py-3.5 rounded-2xl transition text-base'
 
-const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
-  const h = Math.floor(i / 2)
-  const m = i % 2 === 0 ? '00' : '30'
+const TIME_SLOTS = Array.from({ length: 96 }, (_, i) => {
+  const h = Math.floor(i / 4)
+  const m = ['00', '15', '30', '45'][i % 4]
   return `${String(h).padStart(2, '0')}:${m}`
 })
 
